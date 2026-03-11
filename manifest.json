@@ -1,7 +1,7 @@
 {
   "name": "Web Translator Notepad",
   "short_name": "TransPad",
-  "start_url": "notepad.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#18191a",
   "theme_color": "#2e89ff",
@@ -17,4 +17,5 @@
       "type": "image/png"
     }
   ]
+
 }
