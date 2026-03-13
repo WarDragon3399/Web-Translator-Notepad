@@ -1,253 +1,287 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Web Translator Notepad </title>
-    <link rel="manifest" href="manifest.webmanifest">
-    <style>
- :root { 
-    --bg: #18191a; 
-    --text: #e4e6eb; 
-    --box: #242526; 
-    --accent: #2e89ff; 
-    --border: #3a3b3c; 
-    --modal-bg: rgba(0, 0, 0, 0.85);
-}
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title> Web Translator Notepad </title>
+		<link rel="manifest" href="manifest.webmanifest">
+		<style>
+			 :root { 
+				--bg: #18191a; 
+				--text: #e4e6eb; 
+				--box: #242526; 
+				--accent: #2e89ff; 
+				--border: #3a3b3c; 
+				--modal-bg: rgba(0, 0, 0, 0.85);
+			}
 
-.light-mode { 
-    --bg: #f0f2f5; --text: #1c1e21; --box: #ffffff; --accent: #0078d4; --border: #ccc;
-}
+			.light-mode { 
+				--bg: #f0f2f5; --text: #1c1e21; --box: #ffffff; --accent: #0078d4; --border: #ccc;
+			}
 
-body { 
-    font-family: 'Segoe UI', sans-serif; 
-    background: var(--bg); 
-    color: var(--text); 
-    margin: 0; 
-    display: flex; 
-    flex-direction: column; 
-    height: 100vh; 
-    overflow: hidden; 
-}
+			body { 
+				font-family: 'Segoe UI', sans-serif; 
+				background: var(--bg); 
+				color: var(--text); 
+				margin: 0; 
+				display: flex; 
+				flex-direction: column; 
+				height: 100vh; 
+				overflow: hidden; 
+			}
 
-/* --- THE TOOLBAR ENGINE --- */
-.toolbar { 
-    background: var(--box); 
-    padding: 10px 15px; 
-    display: flex; 
-    gap: 10px; 
-    border-bottom: 1px solid var(--border); 
-    align-items: center; 
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3); 
-    z-index: 10; 
-    
-    /* MOBILE DEFAULT: Swipe enabled */
-    flex-wrap: nowrap; 
-    overflow-x: auto; 
-    white-space: nowrap;
-    scrollbar-width: none; 
-}
+			/* --- THE TOOLBAR ENGINE --- */
+			.toolbar { 
+				background: var(--box); 
+				padding: 10px 15px; 
+				display: flex; 
+				gap: 10px; 
+				border-bottom: 1px solid var(--border); 
+				align-items: center; 
+				box-shadow: 0 2px 10px rgba(0,0,0,0.3); 
+				z-index: 5; 
+				
+				/* MOBILE DEFAULT: Swipe enabled */
+				flex-wrap: nowrap; 
+				overflow-x: auto; 
+				white-space: nowrap;
+				scrollbar-width: none; 
+			}
 
-/* Hide scrollbar for Chrome/Safari */
-.toolbar::-webkit-scrollbar { display: none; }
+			/* Hide scrollbar for Chrome/Safari */
+			.toolbar::-webkit-scrollbar { display: none; }
 
-/* DESKTOP RESET: This fixes the "Wide" issue */
-@media (min-width: 1024px) {
-    .toolbar {
-        flex-wrap: wrap;       /* Allows buttons to move to next line if needed */
-        overflow-x: hidden;    /* Removes horizontal scroll on PC */
-        white-space: normal;   /* Allows text to behave normally */
-        justify-content: flex-start;
-    }
+			/* DESKTOP RESET: This fixes the "Wide" issue */
+			@media (min-width: 1024px) {
+				.toolbar {
+					flex-wrap: wrap;       /* Allows buttons to move to next line if needed */
+					overflow-x: hidden;    /* Removes horizontal scroll on PC */
+					white-space: normal;   /* Allows text to behave normally */
+					justify-content: flex-start;
+				}
 
-    /* Let buttons behave normally on Desktop */
-    .toolbar button, 
-    .toolbar select, 
-    .toolbar .save-container {
-        flex-shrink: 1; 
-    }
-}
+				/* Let buttons behave normally on Desktop */
+				.toolbar button, 
+				.toolbar select, 
+				.toolbar .save-container {
+					flex-shrink: 1; 
+				}
+			}
 
-/* On Mobile, we force them NOT to shrink so they stay swipeable */
-@media (max-width: 1023px) {
-    .toolbar button, 
-    .toolbar select, 
-    .toolbar div {
-        flex-shrink: 0;
-    }
-}
+			/* On Mobile, we force them NOT to shrink so they stay swipeable */
+			@media (max-width: 1023px) {
+				.toolbar button, 
+				.toolbar select, 
+				.toolbar div {
+					flex-shrink: 0;
+				}
+			}
 
-/* --- BUTTONS & INPUTS --- */
-select, button { 
-    padding: 8px 14px; 
-    border-radius: 8px; 
-    border: 1px solid var(--border); 
-    cursor: pointer; 
-    font-size: 13px; 
-    font-weight: 600; 
-    background: var(--box); 
-    color: var(--text); 
-    transition: 0.2s; 
-}
+			/* --- BUTTONS & INPUTS --- */
+			select, button { 
+				padding: 8px 14px; 
+				border-radius: 8px; 
+				border: 1px solid var(--border); 
+				cursor: pointer; 
+				font-size: 13px; 
+				font-weight: 600; 
+				background: var(--box); 
+				color: var(--text); 
+				transition: 0.2s; 
+			}
 
-button { background: var(--accent); color: white; border: none; }
-button:hover { opacity: 0.8; transform: translateY(-1px); }
+			button { background: var(--accent); color: white; border: none; }
+			button:hover { opacity: 0.8; transform: translateY(-1px); }
 
-.btn-open { background: #4caf50; }
-.btn-credits { background: #ff9800; color: #000; }
-.btn-share { background: #607d8b; }
-.btn-voice { background: #5c2d91; }
-.btn-stop-voice { background: #d13438; }
+			.btn-open { background: #4caf50; }
+			.btn-credits { background: #ff9800; color: #000; }
+			.btn-share { background: #607d8b; }
+			.btn-voice { background: #5c2d91; }
+			.btn-stop-voice { background: #d13438; }
 
-/* --- EDITOR --- */
-#notepad { 
-    flex: 1; 
-    padding: 30px 40px; 
-    font-size: 20px; 
-    outline: none; 
-    background: var(--bg); 
-    color: var(--text); 
-    overflow-y: auto; 
-    white-space: pre-wrap; 
-    line-height: 1.6; 
-}
+			/* --- EDITOR --- */
+			#notepad { 
+				flex: 1; 
+				padding: 30px 40px; 
+				font-size: 20px; 
+				outline: none; 
+				background: var(--bg); 
+				color: var(--text); 
+				overflow-y: auto; 
+				white-space: pre-wrap; 
+				line-height: 1.6; 
+			}
 
-#notepad:empty:before { 
-    content: "Start typing or use Voice Input..."; 
-    color: #666; font-style: italic; 
-}
+			#notepad:empty:before { 
+				content: "Start typing or use Voice Input..."; 
+				color: #666; font-style: italic; 
+			}
 
-/* --- MODAL BLUR --- */
-#helpModal, #creditsModal {
-    display: none; 
-    position: fixed; 
-    z-index: 1000; 
-    left: 0; 
-    top: 0; 
-    width: 100%; 
-    height: 100%; 
-    background: rgba(0,0,0,0.85); 
-    align-items: center; 
-    justify-content: center; 
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    padding: 20px; /* Forces a gap so modal doesn't touch screen edges on mobile */
-    box-sizing: border-box;
-}
+			/* --- MODAL BLUR --- */
+			#helpModal, #creditsModal {
+				display: none; 
+				position: fixed; 
+				z-index: 2000; 
+				left: 0; 
+				top: 0; 
+				width: 100%; 
+				height: 100%; 
+				background: rgba(0,0,0,0.85); 
+				align-items: center; 
+				justify-content: center; 
+				backdrop-filter: blur(8px);
+				-webkit-backdrop-filter: blur(8px);
+				padding: 20px; /* Forces a gap so modal doesn't touch screen edges on mobile */
+				box-sizing: border-box;
+			}
 
-/* The actual content box */
-#helpModal > div, #creditsModal > div {
-    background: var(--box); 
-    color: var(--text); 
-    padding: 30px; /* Reduced slightly for mobile */
-    border-radius: 15px; 
-    border: 2px solid var(--accent); 
-    width: 100%; 
-    max-width: 600px; /* Maximum size on desktop */
-    max-height: 90vh; /* Prevents modal from being taller than the screen */
-    overflow-y: auto; /* Adds scroll inside modal if content is too long */
-    box-shadow: 0 20px 50px rgba(0,0,0,0.7); 
-    text-align: center;
-    position: relative;
-}
+			/* The actual content box */
+			#helpModal > div, #creditsModal > div {
+				background: var(--box); 
+				color: var(--text); 
+				padding: 30px; /* Reduced slightly for mobile */
+				border-radius: 15px; 
+				border: 2px solid var(--accent); 
+				width: 100%; 
+				max-width: 600px; /* Maximum size on desktop */
+				max-height: 90vh; /* Prevents modal from being taller than the screen */
+				overflow-y: auto; /* Adds scroll inside modal if content is too long */
+				box-shadow: 0 20px 50px rgba(0,0,0,0.7); 
+				text-align: center;
+				position: relative;
+			}
 
-/* Adjustments for very small screens */
-@media (max-width: 480px) {
-    #helpModal > div, #creditsModal > div {
-        padding: 20px;
-        max-width: 100%;
-    }
-    
-    h2 { font-size: 24px !important; }
-    ul { font-size: 15px !important; }
-    button { padding: 12px !important; font-size: 16px !important; }
-}
+			/* Adjustments for very small screens */
+			@media (max-width: 480px) {
+				#helpModal > div, #creditsModal > div {
+					padding: 20px;
+					max-width: 100%;
+				}
+				
+				h2 { font-size: 24px !important; }
+				ul { font-size: 15px !important; }
+				button { padding: 12px !important; font-size: 16px !important; }
+			}
 
-@media (max-width: 600px) {
-    #notepad { padding: 20px; font-size: 18px; }
-}
-    </style>
-</head>
-<body>
+			@media (max-width: 600px) {
+				#notepad { padding: 20px; font-size: 18px; }
+			}
 
-<div class="toolbar">
-   <div style="position: relative; display: inline-block;">
-        <button id="saveMenuBtn" style="background: #2e89ff;">💾 Save As... ▾</button>
-        <div id="saveDropdown" style="display: none; position: absolute; top: 100%; left: 0; background: var(--box); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 100; min-width: 150px;">
-           <div id="saveTxtBtn" style="padding: 10px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
-				<span>📝 Text (.txt)</span>
-				<span style="opacity: 0.5; font-size: 11px;">Ctrl+S</span>
+
+			/* Editor toolbar CSS */
+			/* Ensure the second toolbar doesn't have a double shadow */
+			#formatToolbar {
+				box-shadow: none;
+				padding-bottom: 10px;
+			}
+
+			/* Optional: Make formatting buttons look a bit different */
+			#formatToolbar button {
+				min-width: 40px;
+				font-family: 'Times New Roman', serif;
+			}
+			
+			/* Styling for active formatting buttons */
+			.format-active {
+				background-color: var(--accent) !important;
+				color: white !important;
+				box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+				border: 1px solid white;
+			}
+		</style>
+	</head>
+	<body>
+
+	<div class="toolbar">
+	   <div style="position: relative; display: inline-block;">
+			<button id="saveMenuBtn" style="background: #2e89ff;">💾 Save As... ▾</button>
+			<div id="saveDropdown" style="display: none; position: absolute; top: 100%; left: 0; background: var(--box); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 100; min-width: 150px;">
+			   <div id="saveTxtBtn" style="padding: 10px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
+					<span>📝 Text (.txt)</span>
+					<span style="opacity: 0.5; font-size: 11px;">Ctrl+S</span>
+				</div>
+				<div id="savePdfBtn" style="padding: 10px; cursor: pointer;">📄 PDF (Print)</div>
 			</div>
-            <div id="savePdfBtn" style="padding: 10px; cursor: pointer;">📄 PDF (Print)</div>
-        </div>
-    </div>
-    <button id="openBtn" class="btn-open">📂 Open</button>
-		<input type="file" id="fileInput" style="display: none;" accept=".txt">
-    <button id="shareBtn" class="btn-share">📤 Share</button>
-    <button id="micBtn" class="btn-voice">🎤 Start Voice</button>
-    <button id="stopMicBtn" class="btn-stop-voice">🛑 Stop Voice</button>
-    <span id="statusLight"></span>
-    <div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
-    <select id="srcLang">
-        <option value="auto">Auto-Detect</option>
-        <option value="ar-SA">Arabic (Saudi Arabia)</option>
-        <option value="bn-IN">Bengali</option>
-        <option value="zh-CN">Chinese (Mandarin)</option>
-        <option value="en-IN">English (India)</option>
-        <option value="en-US">English (US)</option>
-        <option value="fr-FR">French</option>
-        <option value="de-DE">German</option>
-        <option value="gu-IN">Gujarati</option>
-        <option value="he-IL">Hebrew (Israel)</option>
-        <option value="hi-IN">Hindi</option>
-        <option value="id-ID">Indonesian</option>
-        <option value="it-IT">Italian</option>
-        <option value="ja-JP">Japanese</option>
-        <option value="kn-IN">Kannada</option>
-        <option value="ko-KR">Korean</option>
-        <option value="ms-MY">Malay (Malaysia)</option>
-        <option value="mr-IN">Marathi</option>
-        <option value="ne-NP">Nepali</option>
-        <option value="pt-PT">Portuguese</option>
-        <option value="ru-RU">Russian</option>
-        <option value="es-ES">Spanish</option>
-        <option value="ta-IN">Tamil</option>
-        <option value="te-IN">Telugu</option>
-        <option value="th-TH">Thai</option>
-        <option value="vi-VN">Vietnamese</option>
-    </select>
-    <span>➡️</span>
-    <select id="targetLang">
-        <option value="ar">Arabic</option>
-        <option value="bn">Bengali</option>
-        <option value="zh">Chinese</option>
-        <option value="en">English</option>
-        <option value="fr">French</option>
-        <option value="de">German</option>
-        <option value="gu">Gujarati</option>
-        <option value="he">Hebrew</option>
-        <option value="hi">Hindi</option>
-        <option value="id">Indonesian</option>
-        <option value="it">Italian</option>
-        <option value="ja">Japanese</option>
-        <option value="kn">Kannada</option>
-        <option value="ko">Korean</option>
-        <option value="ms">Malay</option>
-        <option value="mr">Marathi</option>
-        <option value="ne">Nepali</option>
-        <option value="pt">Portuguese</option>
-        <option value="ru">Russian</option>
-        <option value="es">Spanish</option>
-        <option value="ta">Tamil</option>
-        <option value="te">Telugu</option>
-        <option value="th">Thai</option>
-        <option value="vi">Vietnamese</option>
-    </select> 
-    <button id="convertBtn">🔄 Convert</button>
-    <button id="speakBtn">🔊 Speak</button>
-    <button id="stopBtn" style="background:#d13438">🛑 Stop Audio</button>
-    <button id="themeBtn" style="background:#444">🌓 Theme</button>
-	<button id="helpBtn" style="background: #607d8b"> ? Help </button>
+		</div>
+		<button id="openBtn" class="btn-open">📂 Open</button>
+			<input type="file" id="fileInput" style="display: none;" accept=".txt">
+		<button id="shareBtn" class="btn-share">📤 Share</button>
+		<button id="micBtn" class="btn-voice">🎤 Start Voice</button>
+		<button id="stopMicBtn" class="btn-stop-voice">🛑 Stop Voice</button>
+		<span id="statusLight"></span>
+		<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
+		<select id="srcLang">
+			<option value="auto">Auto-Detect</option>
+			<option value="ar-SA">Arabic (Saudi Arabia)</option>
+			<option value="bn-IN">Bengali</option>
+			<option value="zh-CN">Chinese (Mandarin)</option>
+			<option value="en-IN">English (India)</option>
+			<option value="en-US">English (US)</option>
+			<option value="fr-FR">French</option>
+			<option value="de-DE">German</option>
+			<option value="gu-IN">Gujarati</option>
+			<option value="he-IL">Hebrew (Israel)</option>
+			<option value="hi-IN">Hindi</option>
+			<option value="id-ID">Indonesian</option>
+			<option value="it-IT">Italian</option>
+			<option value="ja-JP">Japanese</option>
+			<option value="kn-IN">Kannada</option>
+			<option value="ko-KR">Korean</option>
+			<option value="ms-MY">Malay (Malaysia)</option>
+			<option value="mr-IN">Marathi</option>
+			<option value="ne-NP">Nepali</option>
+			<option value="pt-PT">Portuguese</option>
+			<option value="ru-RU">Russian</option>
+			<option value="es-ES">Spanish</option>
+			<option value="ta-IN">Tamil</option>
+			<option value="te-IN">Telugu</option>
+			<option value="th-TH">Thai</option>
+			<option value="vi-VN">Vietnamese</option>
+		</select>
+		<span>➡️</span>
+		<select id="targetLang">
+			<option value="ar">Arabic</option>
+			<option value="bn">Bengali</option>
+			<option value="zh">Chinese</option>
+			<option value="en">English</option>
+			<option value="fr">French</option>
+			<option value="de">German</option>
+			<option value="gu">Gujarati</option>
+			<option value="he">Hebrew</option>
+			<option value="hi">Hindi</option>
+			<option value="id">Indonesian</option>
+			<option value="it">Italian</option>
+			<option value="ja">Japanese</option>
+			<option value="kn">Kannada</option>
+			<option value="ko">Korean</option>
+			<option value="ms">Malay</option>
+			<option value="mr">Marathi</option>
+			<option value="ne">Nepali</option>
+			<option value="pt">Portuguese</option>
+			<option value="ru">Russian</option>
+			<option value="es">Spanish</option>
+			<option value="ta">Tamil</option>
+			<option value="te">Telugu</option>
+			<option value="th">Thai</option>
+			<option value="vi">Vietnamese</option>
+		</select> 
+		<button id="convertBtn">🔄 Convert</button>
+		<button id="speakBtn">🔊 Speak</button>
+		<button id="stopBtn" style="background:#d13438">🛑 Stop Audio</button>
+		<button id="themeBtn" style="background:#444">🌓 Theme</button>
+		<button id="helpBtn" style="background: #607d8b"> ? Help </button>
+		<button id="creditsBtn" class="btn-credits">ℹ️ Credits</button>
+	</div>
+	<div class="toolbar" id="formatToolbar" style="border-top: none; padding-top: 5px; background: var(--bg);">
+		<button id="boldBtn" title="Bold (Ctrl+B)" style="background: #333;"><b>B</b></button>
+		<button id="italicBtn" title="Italic (Ctrl+I)" style="background: #333;"><i>I</i></button>
+		<button id="underlineBtn" title="Underline (Ctrl+U)" style="background: #333;"><u>U</u></button>
+		<button id="strikeBtn" title="Strike-through" style="background: #333;"><strike>abc</strike></button>   
+		<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
+	</div>	
+	<div id="notepad" contenteditable="true" spellcheck="false"></div>
+	<script src="logic.js"></script>
+	<script src="editor_tools.js"></script>
 	<div id="helpModal" class="modal-overlay">
 		<div style="background: var(--box); color: var(--text); padding: 25px; border-radius: 15px; border: 2px solid var(--accent); width: 100%; max-width: 650px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center; box-sizing: border-box; overflow: hidden;">
 			
@@ -263,6 +297,9 @@ button:hover { opacity: 0.8; transform: translateY(-1px); }
 					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Convert:</b> Translates entire editor content into <b>Target Language</b>.</li>
 					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Speak:</b> Reads text aloud. If you convert, output voice switches to that language.</li>
 					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word; font-style: italic;">Note: If using a new language first time, voice output may take some time.</li>
+					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Shortcuts:</b> Use <b>Ctrl+B/I/U</b> for Bold, Italic, and Underline.</li>
+					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Strikethrough:</b> Press <b>Alt+h+4</b> (Win) or <b>Cmd+Shift+X</b> (Mac).</li>
+					
 				</ul>
 			</div>
 
@@ -272,24 +309,19 @@ button:hover { opacity: 0.8; transform: translateY(-1px); }
 			</div>
 		</div>
 	</div>
-	<button id="creditsBtn" class="btn-credits">ℹ️ Credits</button>
-</div>
-	
-<div id="notepad" contenteditable="true" spellcheck="false"></div>
-<div id="creditsModal" class="modal-overlay">
-    <div style="background: var(--box); color: var(--text); padding: 30px; border-radius: 15px; border: 2px solid var(--accent); width: 100%; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center;">
-        <h2 style="margin-top: 0; color: var(--accent); font-size: 28px; border-bottom: 2px solid var(--border); padding-bottom: 10px;">💻 Software Info</h2>
-        <div style="margin: 20px 0;">
-            <p style="font-size: 18px; margin-bottom: 5px;"><b>Developed By:</b></p>
-            <p style="font-size: 20px; color: var(--accent); font-weight: bold; margin: 0;">Wardragon3399</p>
-        </div>
-        <div style="margin-bottom: 25px; font-size: 16px;">
-            <p>© Copyright 2026 | All Rights Reserved</p>
-            <a href="https://github.com/parthrathodtk" target="_blank" class="github-link" style="margin-top: 10px;">📂 View GitHub Profile</a>
-        </div>
-        <button id="closeCredits" style="width: 100%;">Close</button>
-    </div>
-</div>
-<script src="logic.js"></script>
+	<div id="creditsModal" class="modal-overlay">
+		<div style="background: var(--box); color: var(--text); padding: 30px; border-radius: 15px; border: 2px solid var(--accent); width: 100%; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center;">
+			<h2 style="margin-top: 0; color: var(--accent); font-size: 28px; border-bottom: 2px solid var(--border); padding-bottom: 10px;">💻 Software Info</h2>
+			<div style="margin: 20px 0;">
+				<p style="font-size: 18px; margin-bottom: 5px;"><b>Developed By:</b></p>
+				<p style="font-size: 20px; color: var(--accent); font-weight: bold; margin: 0;">Wardragon3399</p>
+			</div>
+			<div style="margin-bottom: 25px; font-size: 16px;">
+				<p>© Copyright 2026 | All Rights Reserved</p>
+				<a href="https://github.com/parthrathodtk" target="_blank" class="github-link" style="margin-top: 10px;">📂 View GitHub Profile</a>
+			</div>
+			<button id="closeCredits" style="width: 100%;">Close</button>
+		</div>
+	</div>
 </body>
 </html>
