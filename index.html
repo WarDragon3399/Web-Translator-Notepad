@@ -1,42 +1,131 @@
-<!-- Developed by Parthkumar Rathod wardragon -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Translator Notepad Pro - Parthkumar</title>
+    <title> Web Translator Notepad </title>
     <link rel="manifest" href="manifest.webmanifest">
     <style>
-        :root { 
-            --bg: #18191a; --text: #e4e6eb; --box: #242526; 
-            --accent: #2e89ff; --border: #3a3b3c; --modal-bg: rgba(0, 0, 0, 0.9);
-        }
-        .light-mode { 
-            --bg: #f0f2f5; --text: #1c1e21; --box: #ffffff; 
-            --accent: #0078d4; --border: #ccc;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; transition: 0.3s; }
-        .toolbar { background: var(--box); padding: 12px; display: flex; gap: 8px; border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 10; }
-        select, button { padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; font-size: 13px; font-weight: bold; background: var(--box); color: var(--text); outline: none; transition: 0.2s; }
-        button { background: var(--accent); color: white; border: none; }
-        button:hover { opacity: 0.8; transform: translateY(-1px); }
-        select:focus { border-color: var(--accent); box-shadow: 0 0 5px var(--accent); }
-        .btn-open { background: #4caf50; }
-        .btn-credits { background: #ff9800; color: #000; }
-        .btn-share { background: #607d8b; }
-        .btn-voice { background: #5c2d91; }
-        .btn-stop-voice { background: #d13438; display: none; }
-        #notepad { flex: 1; padding: 40px; font-size: 20px; outline: none; background: var(--bg); color: var(--text); overflow-y: auto; white-space: pre-wrap; line-height: 1.6; position: relative; }
-        #notepad:empty:before { content: "Start typing or use Voice Input..."; color: #666; font-style: italic; pointer-events: none; display: block; }
-        #creditsModal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: var(--modal-bg); align-items: center; justify-content: center; }
-        .modal-content { background-color: var(--box); padding: 30px; border-radius: 12px; text-align: center; border: 1px solid var(--border); width: 320px; }
-        .github-link { display: inline-block; margin: 15px 0; padding: 10px; color: var(--accent); text-decoration: none; font-weight: bold; border: 1px solid var(--accent); border-radius: 5px; }
-        .close-btn { background: #444; color: white; padding: 8px 15px; border: none; border-radius: 4px; margin-top: 10px; cursor: pointer; }
-        .recording-active { border: 2px solid #d13438 !important; }
-        #statusLight { width: 10px; height: 10px; background: gray; border-radius: 50%; display: inline-block; margin-left: 5px; transition: 0.3s; }
-        #interim-span { color: #888; font-style: italic; }
-        .detected-flash { animation: flash 1.5s ease-out; }
-        @keyframes flash { 0% { background-color: var(--accent); color: white; } 100% { background-color: var(--box); color: var(--text); } }
+ :root { 
+    --bg: #18191a; 
+    --text: #e4e6eb; 
+    --box: #242526; 
+    --accent: #2e89ff; 
+    --border: #3a3b3c; 
+    --modal-bg: rgba(0, 0, 0, 0.85);
+}
+
+.light-mode { 
+    --bg: #f0f2f5; --text: #1c1e21; --box: #ffffff; --accent: #0078d4; --border: #ccc;
+}
+
+body { 
+    font-family: 'Segoe UI', sans-serif; 
+    background: var(--bg); 
+    color: var(--text); 
+    margin: 0; 
+    display: flex; 
+    flex-direction: column; 
+    height: 100vh; 
+    overflow: hidden; 
+}
+
+/* --- THE TOOLBAR ENGINE --- */
+.toolbar { 
+    background: var(--box); 
+    padding: 10px 15px; 
+    display: flex; 
+    gap: 10px; 
+    border-bottom: 1px solid var(--border); 
+    align-items: center; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3); 
+    z-index: 10; 
+    
+    /* MOBILE DEFAULT: Swipe enabled */
+    flex-wrap: nowrap; 
+    overflow-x: auto; 
+    white-space: nowrap;
+    scrollbar-width: none; 
+}
+
+/* Hide scrollbar for Chrome/Safari */
+.toolbar::-webkit-scrollbar { display: none; }
+
+/* DESKTOP RESET: This fixes the "Wide" issue */
+@media (min-width: 1024px) {
+    .toolbar {
+        flex-wrap: wrap;       /* Allows buttons to move to next line if needed */
+        overflow-x: hidden;    /* Removes horizontal scroll on PC */
+        white-space: normal;   /* Allows text to behave normally */
+        justify-content: flex-start;
+    }
+
+    /* Let buttons behave normally on Desktop */
+    .toolbar button, 
+    .toolbar select, 
+    .toolbar .save-container {
+        flex-shrink: 1; 
+    }
+}
+
+/* On Mobile, we force them NOT to shrink so they stay swipeable */
+@media (max-width: 1023px) {
+    .toolbar button, 
+    .toolbar select, 
+    .toolbar div {
+        flex-shrink: 0;
+    }
+}
+
+/* --- BUTTONS & INPUTS --- */
+select, button { 
+    padding: 8px 14px; 
+    border-radius: 8px; 
+    border: 1px solid var(--border); 
+    cursor: pointer; 
+    font-size: 13px; 
+    font-weight: 600; 
+    background: var(--box); 
+    color: var(--text); 
+    transition: 0.2s; 
+}
+
+button { background: var(--accent); color: white; border: none; }
+button:hover { opacity: 0.8; transform: translateY(-1px); }
+
+.btn-open { background: #4caf50; }
+.btn-credits { background: #ff9800; color: #000; }
+.btn-share { background: #607d8b; }
+.btn-voice { background: #5c2d91; }
+.btn-stop-voice { background: #d13438; }
+
+/* --- EDITOR --- */
+#notepad { 
+    flex: 1; 
+    padding: 30px 40px; 
+    font-size: 20px; 
+    outline: none; 
+    background: var(--bg); 
+    color: var(--text); 
+    overflow-y: auto; 
+    white-space: pre-wrap; 
+    line-height: 1.6; 
+}
+
+#notepad:empty:before { 
+    content: "Start typing or use Voice Input..."; 
+    color: #666; font-style: italic; 
+}
+
+/* --- MODAL BLUR --- */
+#helpModal, #creditsModal {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+@media (max-width: 600px) {
+    #notepad { padding: 20px; font-size: 18px; }
+}
     </style>
 </head>
 <body>
@@ -53,17 +142,12 @@
         </div>
     </div>
     <button id="openBtn" class="btn-open">📂 Open</button>
-    <input type="file" id="fileInput" style="display: none;" accept=".txt">
+		<input type="file" id="fileInput" style="display: none;" accept=".txt">
     <button id="shareBtn" class="btn-share">📤 Share</button>
-    
     <button id="micBtn" class="btn-voice">🎤 Start Voice</button>
     <button id="stopMicBtn" class="btn-stop-voice">🛑 Stop Voice</button>
     <span id="statusLight"></span>
-    
-    <button id="creditsBtn" class="btn-credits">ℹ️ Credits</button>
-    
     <div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
-
     <select id="srcLang">
         <option value="auto">Auto-Detect</option>
         <option value="ar-SA">Arabic (Saudi Arabia)</option>
@@ -92,9 +176,7 @@
         <option value="th-TH">Thai</option>
         <option value="vi-VN">Vietnamese</option>
     </select>
-
     <span>➡️</span>
-
     <select id="targetLang">
         <option value="ar">Arabic</option>
         <option value="bn">Bengali</option>
@@ -120,27 +202,61 @@
         <option value="te">Telugu</option>
         <option value="th">Thai</option>
         <option value="vi">Vietnamese</option>
-    </select>
-    
+    </select> 
     <button id="convertBtn">🔄 Convert</button>
     <button id="speakBtn">🔊 Speak</button>
     <button id="stopBtn" style="background:#d13438">🛑 Stop Audio</button>
     <button id="themeBtn" style="background:#444">🌓 Theme</button>
-</div>
+	<button id="helpBtn" style="background: #607d8b"> ? Help </button>
+	<div id="helpModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+    <div style="background: var(--box); color: var(--text); padding: 40px; border-radius: 15px; border: 2px solid var(--accent); width: 90%; max-width: 650px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center;">
+        
+        <h2 style="margin-top: 0; color: var(--accent); font-size: 32px; border-bottom: 2px solid var(--border); padding-bottom: 10px;">⌨️ User Guide</h2>
+        
+        <div style="display: inline-block; text-align: left; width: 100%;">
+            <ul style="line-height: 1.6; padding-left: 25px; font-size: 17px; margin-top: 15px;">
+                <li><b>Voice Input:</b> Starts transcription at a new line at the end of the file.</li>
+                <li><b>Save (Ctrl+S):</b> Opens the "Save As" window and tracks in browser history.</li>
+                <li><b>Timestamps:</b> When ON, press <b>Enter</b> to tag the current recording time.</li>
+                <li><b>Focus:</b> The cursor automatically returns to your last position after clicking any tool.</li>
+                <li><b>Language 1:</b> Select the language for Speech-to-Text transcription.</li>
+                <li><b>Convert:</b> Translates your entire editor content into the <b>Second Language</b> option.</li>
+                <li><b>Speak:</b> Reads the text aloud. If you convert the text, the voice output will automatically switch to that language.</li>
+                <li><i>Note: If using a new language for the first time, voice output may take a moment to initialize.</i></li>
+            </ul>
+        </div>
 
-<div id="notepad" contenteditable="true" spellcheck="false"></div>
-
-<div id="creditsModal">
-    <div class="modal-content">
-        <h3>Software Info</h3>
-        <p>Developed By: Parthkumar</p>
-        <p>Copyright 2026</p>
-        <a href="https://github.com/parthrathodtk" target="_blank" class="github-link">GitHub Profile</a>
-        <br>
-        <button id="closeCredits" class="close-btn">Close</button>
+        <div style="display: flex; gap: 20px; margin-top: 30px; justify-content: center;">
+            <button id="docBtn" style="flex: 1; background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s;">📖 Documentation</button>
+            <button id="closeHelp" style="flex: 1; background: var(--accent); padding: 15px; color: white; border-radius: 10px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; transition: 0.2s;">Got it!</button>
+        </div>
     </div>
 </div>
+	<button id="creditsBtn" class="btn-credits">ℹ️ Credits</button>
+</div>
+<div id="notepad" contenteditable="true" spellcheck="false"></div>
+<div id="creditsModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+    <div style="background: var(--box); color: var(--text); padding: 40px; border-radius: 15px; border: 2px solid var(--accent); width: 90%; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center;">
+        
+        <h2 style="margin-top: 0; color: var(--accent); font-size: 32px; border-bottom: 2px solid var(--border); padding-bottom: 10px;">💻 Software Info</h2>
+        
+        <div style="margin: 25px 0;">
+            <p style="font-size: 20px; margin-bottom: 10px;"><b>Developed By:</b></p>
+            <p style="font-size: 22px; color: var(--accent); font-weight: bold; margin: 0;">Wardragon3399</p>
+        </div>
 
+        <div style="margin-bottom: 30px; font-size: 18px;">
+            <p>© Copyright 2026 | All Rights Reserved</p>
+            <a href="https://github.com/parthrathodtk" target="_blank" style="display: inline-block; margin-top: 10px; color: var(--accent); text-decoration: none; font-weight: bold; border: 1px solid var(--accent); padding: 8px 20px; border-radius: 8px; transition: 0.3s;">
+                📂 View GitHub Profile
+            </a>
+        </div>
+
+        <button id="closeCredits" style="width: 100%; background: var(--accent); padding: 15px; color: white; border-radius: 10px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; transition: 0.2s;">
+            Close
+        </button>
+    </div>
+</div>
 <script src="logic.js"></script>
 </body>
 </html>
