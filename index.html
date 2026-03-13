@@ -174,6 +174,12 @@
 				box-shadow: none;
 				padding-bottom: 10px;
 			}
+			
+			//for upperlower case buttons
+			#upperBtn:hover, #lowerBtn:hover {
+				background: var(--accent) !important;
+				transform: scale(1.05);
+			}	
 
 			/* Optional: Make formatting buttons look a bit different */
 			#formatToolbar button {
@@ -280,6 +286,8 @@
 		<button id="underlineBtn" title="Underline (Ctrl+U)" style="background: #333;"><u>U</u></button>
 		<button id="strikeBtn" title="Strike-through" style="background: #333;"><strike>abc</strike></button>
 		<button id="bulletBtn" title="Bullets (Ctrl+Shift+8)" style="background: #333;">• List</button>
+		<button id="upperBtn" title="Make Uppercase" style="background: #444; min-width: 40px;">AA</button>
+		<button id="lowerBtn" title="Make Lowercase" style="background: #444; min-width: 40px;">aa</button>
 		<select id="fontSizeSelect" title="Font Size"></select>
 		<select id="fontStyleSelect" title="Font Style">
 			<option value="Segoe UI">Default Font</option>
