@@ -18,8 +18,14 @@ document.addEventListener('DOMContentLoaded', () => {
 	const fontSizeSelect = document.getElementById('fontSizeSelect');
 	const fontSelect = document.getElementById('fontStyleSelect');	
 	const srcLang = document.getElementById('srcLang');
+	const btnLeft = document.getElementById('alignLeftBtn');
+    const btnCenter = document.getElementById('alignCenterBtn');
+    const btnRight = document.getElementById('alignRightBtn');
+	const colorBtn = document.getElementById('colorBtn');
+    const colorPicker = document.getElementById('colorPicker');
 	
 	setTimeout(checkLanguageForCase, 100);
+	let savedRange = null;
 	
     function format(command) {
         document.execCommand(command, false, null);
@@ -184,6 +190,32 @@ document.addEventListener('DOMContentLoaded', () => {
         notepad.focus();
     });
 
+	//text allignment
+	// Reuse your format function
+    function formatAlign(command) {
+        document.execCommand(command, false, null);
+        notepad.focus();
+        updateToolbar();
+    }
+
+	//Font Color picker
+	// Helper to save where the user was highlighting
+    function saveSelection() {
+        const sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+            savedRange = sel.getRangeAt(0);
+        }
+    }
+
+    // Helper to put the highlight back
+    function restoreSelection() {
+        if (savedRange) {
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(savedRange);
+        }
+    }
+
     // --- LISTENERS ---
     btnBold.addEventListener('click', () => format('bold'));
     btnItalic.addEventListener('click', () => format('italic'));
@@ -193,6 +225,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	upperBtn.addEventListener('click', () => changeCase('upper'));
     lowerBtn.addEventListener('click', () => changeCase('lower'));
     srcLang.addEventListener('change', checkLanguageForCase);
+	btnLeft.addEventListener('click', () => formatAlign('justifyLeft'));
+    btnCenter.addEventListener('click', () => formatAlign('justifyCenter'));
+    btnRight.addEventListener('click', () => formatAlign('justifyRight'));
 	
     // Update buttons whenever the user clicks or moves the cursor in the notepad
     notepad.addEventListener('keyup', updateToolbar);
@@ -212,6 +247,28 @@ document.addEventListener('DOMContentLoaded', () => {
 	// for font Style LISTENERS
 	// Re-filter fonts when the user changes the writing language
     srcLang.addEventListener('change', loadSystemFonts);
+	
+	//for font color LISTENERS
+	colorBtn.addEventListener('click', () => {
+        saveSelection(); // Remember the highlighted text
+        colorPicker.click();
+    });
+
+    colorPicker.addEventListener('input', (e) => {
+        const selectedColor = e.target.value;
+        colorBtn.querySelector('span').style.color = selectedColor;
+        
+        restoreSelection(); // Put the highlight back before applying color
+        document.execCommand('foreColor', false, selectedColor);
+    });
+
+    // Also apply on 'change' to ensure it locks in on mobile
+    colorPicker.addEventListener('change', (e) => {
+        const selectedColor = e.target.value;
+        restoreSelection();
+        document.execCommand('foreColor', false, selectedColor);
+        notepad.focus();
+    });
 	
 	// Initial load
     loadSystemFonts();
@@ -259,11 +316,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 altHPressed = false; // Reset
             }
         }
-		// 4. Bullet Shortcut: Ctrl/Cmd + Shift + L
-		if (ctrlOrCmd && e.shiftKey && e.key.toLowerCase() === 'l') {
+		// 4. Bullet Shortcut: Ctrl/Cmd + Shift + 8
+		if (ctrlOrCmd && e.shiftKey && e.key.toLowerCase() === '*') {
 			e.preventDefault();
 			format('insertUnorderedList');
 		}
+		
+		// 5. Allignment Shortcut keys
+		if (ctrlOrCmd && e.shiftKey) {
+            if (e.key.toLowerCase() === 'l') { e.preventDefault(); formatAlign('justifyLeft'); }
+            if (e.key.toLowerCase() === 'e') { e.preventDefault(); formatAlign('justifyCenter'); }
+            if (e.key.toLowerCase() === 'r') { e.preventDefault(); formatAlign('justifyRight'); }
+        }	
 		
     });
 	
