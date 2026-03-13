@@ -98,12 +98,22 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function startVoice() {
+   function startVoice() {
         if (!recognition) return alert("Speech Recognition not supported.");
+        
+        // 1. Move cursor to the end before starting
+        focusAtEnd(notepad);
+
+        // 2. Add a new line if the notepad isn't empty
+        if (notepad.innerText.trim().length > 0) {
+            document.execCommand('insertParagraph', false);
+        }
+
         isUserStopping = false;
         notepad.classList.add('recording-active');
         micBtn.style.display = "none";
         stopMicBtn.style.display = "inline-block";
+        
         recognition.lang = srcDropdown.value === 'auto' ? 'en-US' : srcDropdown.value;
         recognition.start();
     }
@@ -240,4 +250,57 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('speakBtn').addEventListener('click', playAudio);
     document.getElementById('stopBtn').addEventListener('click', () => window.speechSynthesis.cancel());
     document.getElementById('themeBtn').addEventListener('click', () => document.body.classList.toggle('light-mode'));
+	
+	//// Function to force cursor to the end of the text
+	function focusAtEnd(element) {
+		element.focus();
+		const range = document.createRange();
+		const selection = window.getSelection();
+		
+		// Select all content and collapse the range to the very end
+		range.selectNodeContents(element);
+		range.collapse(false); 
+		
+		selection.removeAllRanges();
+		selection.addRange(range);
+		
+		// Ensure the view scrolls to the cursor
+		element.scrollTop = element.scrollHeight;
+	}
+	
+	// --- HELP MODAL LOGIC ---
+    const helpModal = document.getElementById('helpModal');
+    let lastCursorRange = null;
+
+    document.getElementById('helpBtn').addEventListener('click', () => {
+        // Save cursor position before opening help
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0) {
+            lastCursorRange = sel.getRangeAt(0);
+        }
+        
+        helpModal.style.display = 'flex';
+    });
+
+    document.getElementById('closeHelp').addEventListener('click', () => {
+        helpModal.style.display = 'none';
+        
+        // Restore cursor position so user can continue typing immediately
+        notepad.focus();
+        if (lastCursorRange) {
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(lastCursorRange);
+        } else {
+            focusAtEnd(notepad); // Fallback to end if notepad was empty
+        }
+    });
+
+    // Close if clicking outside the content box
+    window.addEventListener('click', (e) => {
+        if (e.target === helpModal) {
+            document.getElementById('closeHelp').click();
+        }
+    });
+	
 });
