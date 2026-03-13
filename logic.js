@@ -42,90 +42,114 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 2. Voice Recognition Setup ---
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition;
-    let isUserStopping = true;
+let recognition;
+let isUserStopping = true;
 
-    if (Recognition) {
-        recognition = new Recognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
+if (Recognition) {
+    recognition = new Recognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
 
-        recognition.onresult = (event) => {
-            clearTimeout(silenceTimer);
-            let finalTranscript = "";
-            let interimTranscript = "";
+    recognition.onstart = () => {
+        micBtn.style.display = 'none';
+        stopMicBtn.style.display = 'inline-block';
+        statusLight.style.background = '#ffc107'; // Yellow: Listening
+        console.log("Voice Active");
+    };
 
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    finalTranscript += transcript;
-                } else {
-                    interimTranscript += transcript;
-                }
-            }
+    recognition.onspeechstart = () => {
+        statusLight.style.background = '#4caf50'; // Green: Speaking
+        statusLight.style.boxShadow = "0 0 10px #4caf50";
+    };
 
-            const existingInterim = document.getElementById('interim-span');
-            if (existingInterim) existingInterim.remove();
+    recognition.onspeechend = () => {
+        statusLight.style.background = '#ffc107'; // Back to Yellow
+        statusLight.style.boxShadow = "none";
+    };
 
-            if (finalTranscript) notepad.innerText += " " + finalTranscript;
+    recognition.onresult = (event) => {
+        clearTimeout(silenceTimer);
+        let finalTranscript = "";
+        let interimTranscript = "";
 
-            if (interimTranscript) {
-                const span = document.createElement('span');
-                span.id = 'interim-span';
-                span.innerText = " " + interimTranscript;
-                notepad.appendChild(span);
-            }
-
-            silenceTimer = setTimeout(() => {
-                if (!isUserStopping) notepad.innerText += "\n\n";
-            }, SILENCE_LIMIT);
-        };
-
-        recognition.onstart = () => {
-            statusLight.style.background = "#4caf50";
-            statusLight.style.boxShadow = "0 0 10px #4caf50";
-        };
-
-        recognition.onerror = () => { statusLight.style.background = "#d13438"; };
-
-        recognition.onend = () => {
-            if (!isUserStopping) {
-                try { recognition.start(); } catch (e) {}
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript;
             } else {
-                statusLight.style.background = "gray";
-                statusLight.style.boxShadow = "none";
+                interimTranscript += transcript;
             }
-        };
-    }
-
-   function startVoice() {
-        if (!recognition) return alert("Speech Recognition not supported.");
-        
-        // 1. Move cursor to the end before starting
-        focusAtEnd(notepad);
-
-        // 2. Add a new line if the notepad isn't empty
-        if (notepad.innerText.trim().length > 0) {
-            document.execCommand('insertParagraph', false);
         }
 
-        isUserStopping = false;
-        notepad.classList.add('recording-active');
-        micBtn.style.display = "none";
-        stopMicBtn.style.display = "inline-block";
-        
-        recognition.lang = srcDropdown.value === 'auto' ? 'en-US' : srcDropdown.value;
-        recognition.start();
+        const existingInterim = document.getElementById('interim-span');
+        if (existingInterim) existingInterim.remove();
+
+        if (finalTranscript) {
+            // Inserts at cursor position
+            document.execCommand('insertText', false, " " + finalTranscript);
+        }
+
+        if (interimTranscript) {
+            const span = document.createElement('span');
+            span.id = 'interim-span';
+            span.style.color = '#888';
+            span.style.fontStyle = 'italic';
+            span.innerText = " " + interimTranscript;
+            notepad.appendChild(span);
+        }
+
+        silenceTimer = setTimeout(() => {
+            if (!isUserStopping) {
+                document.execCommand('insertParagraph', false);
+            }
+        }, SILENCE_LIMIT);
+    };
+ 
+    recognition.onerror = (event) => {
+        console.error("Mic Error:", event.error);
+        statusLight.style.background = "#d13438"; 
+    };
+
+    recognition.onend = () => {
+        if (!isUserStopping) {
+            try { recognition.start(); } catch (e) {}
+        } else {
+            micBtn.style.display = "inline-block";
+            stopMicBtn.style.display = "none";
+            statusLight.style.background = "gray";
+            statusLight.style.boxShadow = "none";
+            notepad.classList.remove('recording-active');
+        }
+    };
+}
+
+// Global functions for the Button OnClicks
+function startVoice() {
+    if (!recognition) return alert("Speech Recognition not supported.");
+    
+    if (typeof focusAtEnd === "function") focusAtEnd(notepad);
+
+    if (notepad.innerText.trim().length > 0) {
+        document.execCommand('insertParagraph', false);
     }
 
-    function stopVoice() {
-        isUserStopping = true;
-        clearTimeout(silenceTimer);
-        recognition.stop();
-        micBtn.style.display = "inline-block";
-        stopMicBtn.style.display = "none";
-        notepad.classList.remove('recording-active');
+    isUserStopping = false;
+    notepad.classList.add('recording-active');
+    
+    recognition.lang = srcDropdown.value === 'auto' ? 'en-US' : srcDropdown.value;
+    
+    try {
+        recognition.start();
+    } catch (e) {
+        console.log("Recognition already running");
     }
+}
+
+function stopVoice() {
+    isUserStopping = true;
+    clearTimeout(silenceTimer);
+    recognition.stop();
+}
 
     // --- 3. Translation & Audio Functions ---
     async function translateText() {
