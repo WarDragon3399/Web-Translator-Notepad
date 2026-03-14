@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const srcDropdown = document.getElementById('srcLang');
     const targetDropdown = document.getElementById('targetLang');
 	const srcLang = document.getElementById('srcLang');
+	const saveMenuBtn = document.getElementById('saveMenuBtn');
+	const saveDropdown = document.getElementById('saveDropdown');
 
     let silenceTimer;
     const SILENCE_LIMIT = 3000; 
@@ -43,94 +45,98 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 2. Voice Recognition Setup ---
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition;
-let isUserStopping = true;
+	let recognition;
+	let isUserStopping = true;
 
-if (Recognition) {
-    recognition = new Recognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
+	if (Recognition) {
+		recognition = new Recognition();
+		recognition.continuous = true;
+		recognition.interimResults = true;
 
-    recognition.onstart = () => {
-        micBtn.style.display = 'none';
-        stopMicBtn.style.display = 'inline-block';
-        statusLight.style.background = '#ffc107'; // Yellow: Listening
-        console.log("Voice Active");
-    };
+		recognition.onstart = () => {
+			micBtn.style.display = 'none';
+			stopMicBtn.style.display = 'inline-block';
+			statusLight.style.background = '#ffc107'; // Yellow: Listening
+			console.log("Voice Active");
+		};
 
-    recognition.onspeechstart = () => {
-        statusLight.style.background = '#4caf50'; // Green: Speaking
-        statusLight.style.boxShadow = "0 0 10px #4caf50";
-    };
+		recognition.onspeechstart = () => {
+			statusLight.style.background = '#4caf50'; // Green: Speaking
+			statusLight.style.boxShadow = "0 0 10px #4caf50";
+		};
 
-    recognition.onspeechend = () => {
-        statusLight.style.background = '#ffc107'; // Back to Yellow
-        statusLight.style.boxShadow = "none";
-    };
+		recognition.onspeechend = () => {
+			statusLight.style.background = '#ffc107'; // Back to Yellow
+			statusLight.style.boxShadow = "none";
+		};
 
-    recognition.onresult = (event) => {
-        clearTimeout(silenceTimer);
-        let finalTranscript = "";
-        let interimTranscript = "";
+		recognition.onresult = (event) => {
+			clearTimeout(silenceTimer);
+			let finalTranscript = "";
+			let interimTranscript = "";
 
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-                finalTranscript += transcript;
-            } else {
-                interimTranscript += transcript;
-            }
-        }
-
-        const existingInterim = document.getElementById('interim-span');
-        if (existingInterim) existingInterim.remove();
-
-        if (finalTranscript) {
-            // Inserts at cursor position
-            let processedText = finalTranscript;
-			const currentLang = document.getElementById('srcLang').value;
-
-			// Apply CapsLock only if it's ON and language is English
-			if (isCapsLockOn && currentLang.startsWith('en')) {
-				processedText = finalTranscript.toUpperCase();
+			for (let i = event.resultIndex; i < event.results.length; i++) {
+				const transcript = event.results[i][0].transcript;
+				if (event.results[i].isFinal) {
+					finalTranscript += transcript;
+				} else {
+					interimTranscript += transcript;
+				}
 			}
 
-			document.execCommand('insertText', false, " " + processedText);
-        }
+			const existingInterim = document.getElementById('interim-span');
+			if (existingInterim) existingInterim.remove();
 
-        if (interimTranscript) {
-            const span = document.createElement('span');
-            span.id = 'interim-span';
-            span.style.color = '#888';
-            span.style.fontStyle = 'italic';
-            span.innerText = " " + interimTranscript;
-            notepad.appendChild(span);
-        }
+			if (finalTranscript) {
+				// Inserts at cursor position
+				let processedText = finalTranscript;
+				const currentLang = document.getElementById('srcLang').value;
 
-        silenceTimer = setTimeout(() => {
-            if (!isUserStopping) {
-                document.execCommand('insertParagraph', false);
-            }
-        }, SILENCE_LIMIT);
-    };
- 
-    recognition.onerror = (event) => {
-        console.error("Mic Error:", event.error);
-        statusLight.style.background = "#d13438"; 
-    };
+				// Apply CapsLock only if it's ON and language is English
+				if (isCapsLockOn && currentLang.startsWith('en')) {
+					processedText = finalTranscript.toUpperCase();
+				}
 
-    recognition.onend = () => {
-        if (!isUserStopping) {
-            try { recognition.start(); } catch (e) {}
-        } else {
-            micBtn.style.display = "inline-block";
-            stopMicBtn.style.display = "none";
-            statusLight.style.background = "gray";
-            statusLight.style.boxShadow = "none";
-            notepad.classList.remove('recording-active');
-        }
-    };
-}
+				document.execCommand('insertText', false, " " + processedText);
+			}
+
+			if (interimTranscript) {
+				const span = document.createElement('span');
+				span.id = 'interim-span';
+				span.style.color = '#888';
+				span.style.fontStyle = 'italic';
+				span.innerText = " " + interimTranscript;
+				notepad.appendChild(span);
+			}
+
+			silenceTimer = setTimeout(() => {
+				// 1. Create the new line
+				document.execCommand('insertParagraph', false);
+				
+				// 2. IMMEDIATELY call our new timestamp function
+				if (typeof window.insertProTimestamp === "function") {
+					window.insertProTimestamp();
+				}
+			}, SILENCE_LIMIT);
+		};
+	 
+		recognition.onerror = (event) => {
+			console.error("Mic Error:", event.error);
+			statusLight.style.background = "#d13438"; 
+		};
+
+		recognition.onend = () => {
+			if (!isUserStopping) {
+				try { recognition.start(); } catch (e) {}
+			} else {
+				micBtn.style.display = "inline-block";
+				stopMicBtn.style.display = "none";
+				statusLight.style.background = "gray";
+				statusLight.style.boxShadow = "none";
+				notepad.classList.remove('recording-active');
+			}
+		};
+	}
 
 // Global functions for the Button OnClicks
 function startVoice() {
@@ -140,6 +146,10 @@ function startVoice() {
 
     if (notepad.innerText.trim().length > 0) {
         document.execCommand('insertParagraph', false);
+    }
+
+	if (typeof window.insertProTimestamp === "function") {
+        window.insertProTimestamp();
     }
 
     isUserStopping = false;
@@ -205,18 +215,25 @@ function stopVoice() {
     stopMicBtn.addEventListener('click', stopVoice);
 	
 	// --- 1. TOGGLE SAVE MENU ---
-    const saveMenuBtn = document.getElementById('saveMenuBtn');
-    const saveDropdown = document.getElementById('saveDropdown');
-
-    saveMenuBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevents immediate closing
-        saveDropdown.style.display = saveDropdown.style.display === 'block' ? 'none' : 'block';
-    });
+	saveMenuBtn.addEventListener('click', (e) => {
+		e.stopPropagation();
+		
+		// 1. Get the exact position of the button on the screen
+		const rect = saveMenuBtn.getBoundingClientRect();
+		
+		// 2. Position the menu exactly under the button
+		saveDropdown.style.top = (rect.bottom + 5) + 'px';
+		saveDropdown.style.left = rect.left + 'px';
+		
+		// 3. Toggle visibility
+		const isHidden = saveDropdown.style.display === 'none' || saveDropdown.style.display === '';
+		saveDropdown.style.display = isHidden ? 'block' : 'none';
+	});
 
     // Close menu if user clicks anywhere else
     window.addEventListener('click', () => {
-        saveDropdown.style.display = 'none';
-    });
+		saveDropdown.style.display = 'none';
+	});
 
     // --- 2. SAVE AS TEXT (.TXT) ---
     document.getElementById('saveTxtBtn').addEventListener('click', async () => {
