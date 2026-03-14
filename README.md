@@ -18,3 +18,10 @@ https://wardragon3399.github.io/Web-Translator-Notepade/
 - Direct modifications to the base code are not permitted without prior discussion and approval.
 - If you wish to add new modules (e.g., PDF/Word export), please contact the maintainer first.
 - Proper credit must be given to the base idea and module when extending functionality.
+
+### Language Support
+- Full coverage of European languages (French, German, Spanish, etc.)
+- South East Asian languages (Thai, Vietnamese, Filipino, Malay, Burmese)
+- Arabic with right-to-left script support
+- Indian native languages (Hindi, Gujarati, Tamil, Bengali, Marathi, Telugu, etc.)
+- East Asian languages (Japanese, Chinese, Korean)
