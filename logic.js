@@ -237,29 +237,43 @@ function stopVoice() {
 
     // --- 2. SAVE AS TEXT (.TXT) ---
     document.getElementById('saveTxtBtn').addEventListener('click', async () => {
-        const text = notepad.innerText.trim();
-        if (!text) return alert("Nothing to save!");
+		const text = notepad.innerText.trim();
+		if (!text) return alert("Nothing to save!");
 
-        if ('showSaveFilePicker' in window) {
-            try {
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: 'My_Note.txt',
-                    types: [{ description: 'Text', accept: {'text/plain': ['.txt']} }]
-                });
-                const writable = await handle.createWritable();
-                await writable.write(text);
-                await writable.close();
+		const fileName = `My note.txt`;
 
-                // Trigger Ghost Download for History/Flyout
-                const blob = new Blob([text], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = (await handle.getFile()).name;
-                a.click();
-            } catch (err) { console.log("Save cancelled"); }
-        }
-    });
+		// 1. TRY THE MODERN WAY (Desktop Only)
+		if ('showSaveFilePicker' in window && !/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+			try {
+				const handle = await window.showSaveFilePicker({
+					suggestedName: fileName,
+					types: [{ description: 'Text', accept: {'text/plain': ['.txt']} }]
+				});
+				const writable = await handle.createWritable();
+				await writable.write(text);
+				await writable.close();
+				return; // Success on Desktop
+			} catch (err) { 
+				console.log("Save Picker cancelled or failed"); 
+			}
+		}
+
+		// 2. THE UNIVERSAL WAY (Mobile & Fallback)
+		// This creates a virtual file and "clicks" it for the user
+		const blob = new Blob([text], { type: 'text/plain' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		
+		a.href = url;
+		a.download = fileName;
+		
+		document.body.appendChild(a);
+		a.click(); // This triggers the download bar on Chrome/Brave Mobile
+		document.body.removeChild(a);
+		
+		URL.revokeObjectURL(url);
+		console.log("Mobile Download Triggered");
+	});
 
     // --- 3. SAVE AS PDF (PRINT) ---
     document.getElementById('savePdfBtn').addEventListener('click', () => {
