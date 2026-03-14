@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnRight = document.getElementById('alignRightBtn');
 	const colorBtn = document.getElementById('colorBtn');
     const colorPicker = document.getElementById('colorPicker');
+	const extraToolbar = document.getElementById('extraToolbar');
+    const toggleBtn = document.getElementById('toggleExtraBtn');
 	
 	setTimeout(checkLanguageForCase, 100);
 	let savedRange = null;
@@ -268,6 +270,19 @@ document.addEventListener('DOMContentLoaded', () => {
         restoreSelection();
         document.execCommand('foreColor', false, selectedColor);
         notepad.focus();
+    });
+	
+	// Toggle the 3rd Menu
+    toggleBtn.addEventListener('click', () => {
+        if (extraToolbar.style.display === 'none') {
+            extraToolbar.style.display = 'flex';
+            toggleBtn.innerHTML = '🛠️ Extra Tools ▴';
+            toggleBtn.style.background = 'var(--accent)';
+        } else {
+            extraToolbar.style.display = 'none';
+            toggleBtn.innerHTML = '🛠️ Extra Tools ▾';
+            toggleBtn.style.background = '#673ab7';
+        }
     });
 	
 	// Initial load
