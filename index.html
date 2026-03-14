@@ -270,6 +270,42 @@
 				text-shadow: none !important;
 			}
 		}
+		
+		/*water mark*/
+		* Visible only when printing */
+		#printWatermark {
+			display: none;
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%) rotate(-45deg);
+			opacity: 0.1; /* Very subtle */
+			pointer-events: none;
+			z-index: -1; /* Behind the text */
+			text-align: center;
+			width: 80%;
+		}
+
+		@media print {
+			#printWatermark {
+				display: block !important;
+			}
+		}
+
+		/* Style for text watermark */
+		.wm-text {
+			font-size: 80pt;
+			font-weight: bold;
+			color: black;
+			white-space: nowrap;
+		}
+
+		/* Style for image watermark */
+		.wm-img {
+			max-width: 400px;
+			height: auto;
+			filter: grayscale(1);
+		}
 		</style>
 	</head>
 	<body>
@@ -392,6 +428,7 @@
 		<button id="timestampToggle">⏱️ Time: OFF</button>
 		<span id="sessionTimer" style="display:none;">00:00:00</span>
 		<button id="sanitizeNotepadBtn" style="background: #607d8b; color: white;">🧹 Clear Formatting</button>
+		<button id="watermarkBtn" style="background: #009688; color: white;">🖼️ Watermark ▾</button>
 	</div>
 	<div id="notepad" contenteditable="true" spellcheck="true" lang="en"></div>
 	<div id="statusBar" style="background: var(--box); padding: 5px 15px; font-size: 12px; border-top: 1px solid var(--border); display: flex; gap: 20px; color: #888;">
@@ -405,6 +442,7 @@
 	<script src="replace.js"></script>
 	<script src="timestamp.js"></script>
 	<script src="clear.js"></script>
+	<script src="watermark.js"></script>
 	
 	<div id="saveDropdown" style="display: none; position: fixed; background: var(--box); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 9999; min-width: 180px;">
 		<div id="saveTxtBtn" style="padding: 12px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
@@ -453,5 +491,12 @@
 			<button id="closeCredits" style="width: 100%;">Close</button>
 		</div>
 	</div>
+	<div id="watermarkDropdown" style="display: none; position: fixed; background: #242526; border: 1px solid #3a3b3c; border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 20000; min-width: 180px; color: white;">
+		<div id="wmTextOption" style="padding: 12px; cursor: pointer; border-bottom: 1px solid #3a3b3c;">🔤 Text Watermark</div>
+		<div id="wmImageOption" style="padding: 12px; cursor: pointer; border-bottom: 1px solid #3a3b3c;">🖼️ Image Watermark</div>
+		<div id="wmClearOption" style="padding: 12px; cursor: pointer; color: #ff5555;">❌ Remove Watermark</div>
+	</div>
+	<input type="file" id="wmImageInput" style="display: none;" accept="image/*">
+	<div id="printWatermark"></div>
 </body>
 </html>
