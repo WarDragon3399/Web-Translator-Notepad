@@ -429,6 +429,7 @@
 		<span id="sessionTimer" style="display:none;">00:00:00</span>
 		<button id="sanitizeNotepadBtn" style="background: #607d8b; color: white;">🧹 Clear Formatting</button>
 		<button id="watermarkBtn" style="background: #009688; color: white;">🖼️ Watermark ▾</button>
+		<button id="autoSaveToggle" style="background: #444; color: white; transition: 0.3s;">🔄 Auto-Save: OFF</button>
 	</div>
 	<div id="notepad" contenteditable="true" spellcheck="true" lang="en"></div>
 	<div id="statusBar" style="background: var(--box); padding: 5px 15px; font-size: 12px; border-top: 1px solid var(--border); display: flex; gap: 20px; color: #888;">
@@ -443,6 +444,7 @@
 	<script src="timestamp.js"></script>
 	<script src="clear.js"></script>
 	<script src="watermark.js"></script>
+	<script src="autosave.js"></script>
 	
 	<div id="saveDropdown" style="display: none; position: fixed; background: var(--box); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 9999; min-width: 180px;">
 		<div id="saveTxtBtn" style="padding: 12px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
@@ -472,7 +474,9 @@
 			</div>
 
 			<div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap;">
-				<button id="docBtn" style="flex: 1; min-width: 120px; background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 12px;">📖 Docs</button>
+				<button id="docBtn" style="flex: 1; min-width: 120px; background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 12px;">
+					<a href="https://github.com/WarDragon3399/Web-Translator-Notepade/wiki" target="_blank" class="github-link" style="margin-top: 10px;">📖 Docs</a>
+				</button>
 				<button id="closeHelp" style="flex: 1; min-width: 120px; padding: 12px;">Got it!</button>
 			</div>
 		</div>
@@ -486,7 +490,7 @@
 			</div>
 			<div style="margin-bottom: 25px; font-size: 16px;">
 				<p>© Copyright 2026 | All Rights Reserved</p>
-				<a href="https://github.com/parthrathodtk" target="_blank" class="github-link" style="margin-top: 10px;">📂 View GitHub Profile</a>
+				<a href="https://github.com/WarDragon3399" target="_blank" class="github-link" style="margin-top: 10px;">📂 View GitHub Profile</a>
 			</div>
 			<button id="closeCredits" style="width: 100%;">Close</button>
 		</div>

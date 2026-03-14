@@ -1,21 +1,20 @@
 {
+  "manifest_version": 3,
   "name": "Web Translator Notepad",
+  "version": "1.0.0",
+  "description": "A lightweight, dark-mode translator notepad with voice input and sharing features.",
   "short_name": "TransPad",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#18191a",
-  "theme_color": "#2e89ff",
-  "icons": [
-    {
-      "src": "icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
-
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "permissions": ["tabs", "storage"],
+  "action": {
+    "default_icon": "icon.png",
+    "default_title": "Open Translator Notepad"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
 }

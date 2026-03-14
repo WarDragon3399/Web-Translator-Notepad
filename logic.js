@@ -137,40 +137,60 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		};
 	}
+	
+	
 
-// Global functions for the Button OnClicks
-function startVoice() {
-    if (!recognition) return alert("Speech Recognition not supported.");
-    
-    if (typeof focusAtEnd === "function") focusAtEnd(notepad);
+	// Global functions for the Button OnClicks
+	function startVoice() {
+		if (!recognition) return alert("Speech Recognition not supported on this browser.");
+		const useOnline = confirm("Use Online Google Services for better accuracy?\n\nOK = Online (Google)\nCancel = Local (Device Only)");
+		if (useOnline) {
+			alert("System: Using Online Google Cloud Services.");
+		} else {
+			// Note: Browsers don't give a direct "isInstalled" for Speech yet, 
+			// but we can warn them to check settings.
+			alert("System: Attempting Local Device Recognition. If it fails, please download the Language Pack in your Device Settings.");
+		}
+		
+		if (typeof focusAtEnd === "function") focusAtEnd(notepad);
 
-    if (notepad.innerText.trim().length > 0) {
-        document.execCommand('insertParagraph', false);
-    }
+		if (notepad.innerText.trim().length > 0) {
+			document.execCommand('insertParagraph', false);
+		}
 
-	if (typeof window.insertProTimestamp === "function") {
-        window.insertProTimestamp();
-    }
+		if (typeof window.insertProTimestamp === "function") {
+			window.insertProTimestamp();
+		}
 
-    isUserStopping = false;
-    notepad.classList.add('recording-active');
-    
-    recognition.lang = srcDropdown.value === 'auto' ? 'en-US' : srcDropdown.value;
-    
-    try {
-        recognition.start();
-    } catch (e) {
-        console.log("Recognition already running");
-    }
-}
+		isUserStopping = false;
+		notepad.classList.add('recording-active');
+		
+		recognition.lang = srcDropdown.value === 'auto' ? 'en-US' : srcDropdown.value;
+		
+		try {
+			recognition.start();
+		} catch (e) {
+			console.log("Recognition already running");
+		}
+	}
 
-function stopVoice() {
-    isUserStopping = true;
-    clearTimeout(silenceTimer);
-    recognition.stop();
-}
+	function stopVoice() {
+		isUserStopping = true;
+		clearTimeout(silenceTimer);
+		recognition.stop();
+	}
 
     // --- 3. Translation & Audio Functions ---
+	
+	// --- HYBRID LANGUAGE ENGINE ---
+
+	// Helper to check if a Local Voice is installed
+	function isLanguageInstalledLocally(langCode) {
+		const voices = window.speechSynthesis.getVoices();
+		// Check if any installed voice matches the language (e.g., "gu-IN")
+		return voices.some(v => v.lang.startsWith(langCode.split('-')[0]) && !v.localService === false);
+	}
+	
     async function translateText() {
         const text = notepad.innerText.trim();
         if(!text) return;
@@ -199,8 +219,21 @@ function stopVoice() {
         window.speechSynthesis.cancel();
         const text = notepad.innerText.trim();
         if (!text) return;
+		const targetCode = targetDropdown.value;
+		const isInstalled = isLanguageInstalledLocally(targetCode);
+
+		if (!isInstalled) {
+			const choice = confirm(`Language Pack for [${targetCode}] is MISSING on this device.\n\nWould you like to use the Online Google Voice instead?`);
+			if (!choice) {
+				return alert("Action Cancelled. Please download the Language Pack in your Device/Windows Settings to use offline.");
+			}
+			alert("System: Using Online Google Voice.");
+		} 
+		else {
+			alert("System: Using Local Device Voice.");
+		}
+		
         const utter = new SpeechSynthesisUtterance(text);
-        const targetCode = targetDropdown.value;
         utter.lang = targetCode;
 
         const voices = window.speechSynthesis.getVoices();
@@ -413,15 +446,15 @@ function stopVoice() {
 
 	// word couts 
 	function updateCounts() {
-    const text = notepad.innerText.trim();
-    const words = text ? text.split(/\s+/).length : 0;
-    const chars = text.length;
+		const text = notepad.innerText.trim();
+		const words = text ? text.split(/\s+/).length : 0;
+		const chars = text.length;
 
-    document.getElementById('wordCount').innerText = `Words: ${words}`;
-    document.getElementById('charCount').innerText = `Characters: ${chars}`;
-}
+		document.getElementById('wordCount').innerText = `Words: ${words}`;
+		document.getElementById('charCount').innerText = `Characters: ${chars}`;
+	}
 
 	// Update counts whenever the user types
-	notepad.addEventListener('input', updateCounts);	
-	
+	notepad.addEventListener('input', updateCounts);
+
 });
