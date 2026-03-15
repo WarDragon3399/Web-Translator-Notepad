@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveSelection() {
         const sel = window.getSelection();
         if (sel.getRangeAt && sel.rangeCount) {
-            savedRange = sel.getRangeAt(0);
+           savedRange = sel.getRangeAt(0).cloneRange();
         }
     }
 
@@ -251,26 +251,43 @@ document.addEventListener('DOMContentLoaded', () => {
     srcLang.addEventListener('change', loadSystemFonts);
 	
 	//for font color LISTENERS
-	colorBtn.addEventListener('click', () => {
-        saveSelection(); // Remember the highlighted text
-        colorPicker.click();
-    });
+	colorBtn.addEventListener('click', (e) => {
+		e.preventDefault();
+		saveSelection(); // Capture exactly what is highlighted RIGHT NOW
+		colorPicker.click();
+	});
 
-    colorPicker.addEventListener('input', (e) => {
-        const selectedColor = e.target.value;
-        colorBtn.querySelector('span').style.color = selectedColor;
-        
-        restoreSelection(); // Put the highlight back before applying color
-        document.execCommand('foreColor', false, selectedColor);
-    });
+   colorPicker.addEventListener('input', (e) => {
+		const selectedColor = e.target.value;
+		colorBtn.querySelector('span').style.color = selectedColor;
+		
+		// Only apply during 'input' if we are on Desktop
+		if (window.innerWidth > 600) {
+			restoreSelection();
+			document.execCommand('foreColor', false, selectedColor);
+		}
+	});
 
     // Also apply on 'change' to ensure it locks in on mobile
-    colorPicker.addEventListener('change', (e) => {
-        const selectedColor = e.target.value;
-        restoreSelection();
-        document.execCommand('foreColor', false, selectedColor);
-        notepad.focus();
-    });
+   colorPicker.addEventListener('change', (e) => {
+		const selectedColor = e.target.value;
+		
+		// Update the UI icon color
+		colorBtn.querySelector('span').style.color = selectedColor;
+		
+		// Force focus back to notepad FIRST
+		notepad.focus(); 
+		
+		// Re-highlight the text that was selected before the picker opened
+		restoreSelection();
+		
+		// Apply the color
+		document.execCommand('foreColor', false, selectedColor);
+		
+		// Cleanup
+		savedRange = null; 
+		console.log("Color applied to mobile selection");
+	});
 	
 	// Toggle the 3rd Menu
     toggleBtn.addEventListener('click', () => {
