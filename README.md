@@ -21,7 +21,7 @@ Built for students, reporters, courts, and professionals who need fast, sovereig
 
 ## 🛡️ Philosophy
 This project wasn’t planned on paper.  
-It started as a personal tool built after 2020 to solve real needs, then expanded with features useful to everyday users.  
+It started as a personal tool built to solve real needs of my own work, then expanded with features useful to everyday users.  
 
 - No APIs  
 - No PHP burden  
