@@ -1,5 +1,6 @@
 /**
- * watermark.js - Pro Court Version
+ * watermark.js - Pro Court/offical docs Version
+ * Developed by: Wardragon3399
  */
 (function() {
     console.log("Watermark Engine: Checking for elements...");
