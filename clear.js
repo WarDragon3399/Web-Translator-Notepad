@@ -1,4 +1,5 @@
 /**
+ * Developed by: Wardragon3399
  * clear.js - Unique ID Version
  */
 (function() {
