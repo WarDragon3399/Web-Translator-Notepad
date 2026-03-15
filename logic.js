@@ -1,4 +1,6 @@
-// Developed by Parthkumar Rathod (Wardragon3399)
+/**
+	
+*/
 document.addEventListener('DOMContentLoaded', () => {
     const notepad = document.getElementById('notepad');
     const micBtn = document.getElementById('micBtn');
