@@ -1,5 +1,6 @@
 /**
  * timestamp.js - Pro Court Logic
+ * Developed by: Wardragon3399
  */
 (function() {
     let startTime = null;
