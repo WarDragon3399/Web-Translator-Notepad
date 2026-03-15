@@ -1,4 +1,5 @@
 /**
+ * Developed by: Wardragon3399
  * advanced_logic.js 
  * Professional Find, Replace, and Formatting Reset
  */
