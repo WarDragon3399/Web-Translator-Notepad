@@ -1,5 +1,6 @@
 /**
  * replace.js 
+ * Developed by: Wardragon3399
  */
 (function() {
     console.log("Wardragon Replace Engine: Standing By");
