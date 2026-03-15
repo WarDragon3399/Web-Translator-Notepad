@@ -41,7 +41,8 @@ Just a **sovereign, offline‑first tool** that adapts to your device and langua
 
 ## 🚀 Installation
 - Use directly via the [Live Demo](https://wardragon3399.github.io/Web-Translator-Notepad/)  
-- Or install the packaged extension (Edge/Chrome)  
+- Or install the packaged extension (Edge store/Firefox)
+- for other youn install via this store or download zip/extention file and import in your browser.  
 
 ---
 
