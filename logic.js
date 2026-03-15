@@ -1,6 +1,8 @@
 /**
-	
-*/
+ * logic.js 
+ * Developed by: Wardragon3399
+ * Core logic tools moslty from mainmenu buttons. 
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const notepad = document.getElementById('notepad');
     const micBtn = document.getElementById('micBtn');
