@@ -1,4 +1,5 @@
 /**
+ * Developed by: Wardragon3399   
  * autosave.js - Independent Tab Engine
  */
 (function() {
