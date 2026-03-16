@@ -8,7 +8,7 @@
 		<title> Web Translator Notepad </title>
 		<link rel="manifest" href="manifest.webmanifest">
 		<style>
-			 :root { 
+			:root { 
 				--bg: #18191a; 
 				--text: #e4e6eb; 
 				--box: #242526; 
@@ -228,295 +228,385 @@
 			
 			/* Misc */
 			#capsWarning {
-			display: none;
-			color: #ff9800;
-			font-size: 12px;
-			font-weight: bold;
-			margin-left: 10px;
-		}
+				display: none;
+				color: #ff9800;
+				font-size: 12px;
+				font-weight: bold;
+				margin-left: 10px;
+			}
 		
-		/*Print as PDF*/
-		@media print {
-			/* 1. Hide every UI element */
-			.toolbar, 
-			#statusBar, 
-			#saveDropdown, 
-			.modal-overlay {
-				display: none !important;
-			}
+			/*Print as PDF*/
+			@media print {
+				/* 1. Hide every UI element */
+				.toolbar, 
+				#statusBar, 
+				#saveDropdown, 
+				.modal-overlay {
+					display: none !important;
+				}
 
-			/* 2. Reset the body so it doesn't clip the text */
-			body {
-				background: white !important;
-				color: black !important;
-				overflow: visible !important;
-				height: auto !important;
-			}
+				/* 2. Reset the body so it doesn't clip the text */
+				body {
+					background: white !important;
+					color: black !important;
+					overflow: visible !important;
+					height: auto !important;
+				}
 
-			/* 3. Make the notepad take up the whole page */
-			#notepad {
-				padding: 0 !important;
-				margin: 0 !important;
-				border: none !important;
-				width: 100% !important;
-				height: auto !important;
-				overflow: visible !important;
-				background: white !important;
-				color: black !important;
-				font-size: 14pt !important; /* Standard print size */
-			}
+				/* 3. Make the notepad take up the whole page */
+				#notepad {
+					padding: 0 !important;
+					margin: 0 !important;
+					border: none !important;
+					width: 100% !important;
+					height: auto !important;
+					overflow: visible !important;
+					background: white !important;
+					color: black !important;
+					font-size: 14pt !important; /* Standard print size */
+				}
 
-			/* 4. Optional: Remove any dark theme scrollbars or shadows */
-			* {
-				box-shadow: none !important;
-				text-shadow: none !important;
+				/* 4. Optional: Remove any dark theme scrollbars or shadows */
+				* {
+					box-shadow: none !important;
+					text-shadow: none !important;
+				}
 			}
-		}
 		
-		/*water mark*/
-		* Visible only when printing */
-		#printWatermark {
-			display: none;
-			position: fixed;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%) rotate(-45deg);
-			opacity: 0.1; /* Very subtle */
-			pointer-events: none;
-			z-index: -1; /* Behind the text */
-			text-align: center;
-			width: 80%;
-		}
-
-		@media print {
+			/*water mark*/
+			* Visible only when printing */
 			#printWatermark {
-				display: block !important;
+				display: none;
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%) rotate(-45deg);
+				opacity: 0.1; /* Very subtle */
+				pointer-events: none;
+				z-index: -1; /* Behind the text */
+				text-align: center;
+				width: 80%;
 			}
-		}
 
-		/* Style for text watermark */
-		.wm-text {
-			font-size: 80pt;
-			font-weight: bold;
-			color: black;
-			white-space: nowrap;
-		}
+			@media print {
+				#printWatermark {
+					display: block !important;
+				}
+			}
 
-		/* Style for image watermark */
-		.wm-img {
-			max-width: 400px;
-			height: auto;
-			filter: grayscale(1);
-		}
+			/* Style for text watermark */
+			.wm-text {
+				font-size: 80pt;
+				font-weight: bold;
+				color: black;
+				white-space: nowrap;
+			}
+
+			/* Style for image watermark */
+			.wm-img {
+				max-width: 400px;
+				height: auto;
+				filter: grayscale(1);
+			}
 		
-		#notepad p {
-			margin-top: 8px;
-			margin-bottom: 8px;
-			min-height: 1em; /* Keeps the line height consistent even if empty */
-		}
-		
-		paraBtn {
-			background: #444; /* Darker than the action buttons */
-			border-left: 2px solid var(--accent); /* A small blue stripe to make it look "Classic" */
-		}
+			#notepad p {
+				margin-top: 8px;
+				margin-bottom: 8px;
+				min-height: 1em; /* Keeps the line height consistent even if empty */
+			}
+			
+			paraBtn {
+				background: #444; /* Darker than the action buttons */
+				border-left: 2px solid var(--accent); /* A small blue stripe to make it look "Classic" */
+			}
+			
+			
+			/* Fix the typo and add specific dropdown layering */
+			#paraBtn {
+				background: #444; 
+				border-left: 2px solid var(--accent); 
+			}
+
+			#supportDropdown {
+				display: none; 
+				position: absolute; 
+				right: 0; 
+				top: 110%; /* Spaced slightly below the button */
+				background: var(--box); 
+				border: 1px solid var(--border); 
+				border-radius: 8px; 
+				box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+				z-index: 99999 !important; /* Forces it to the absolute top layer */
+				min-width: 200px;
+			}
+
+			/* Ensure the items look like clickable menu options */
+			.support-item {
+				padding: 12px;
+				cursor: pointer;
+				transition: 0.2s;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				color: var(--text);
+			}
+
+			.support-item:hover {
+				background-color: var(--accent);
+				color: white;
+			}
+			
+			
+					/* Fix the typo and add specific dropdown layering */
+			#paraBtn {
+				background: #444; 
+				border-left: 2px solid var(--accent); 
+			}
+
+			#supportDropdown {
+				display: none; 
+				position: absolute; 
+				right: 0; 
+				top: 110%; /* Spaced slightly below the button */
+				background: var(--box); 
+				border: 1px solid var(--border); 
+				border-radius: 8px; 
+				box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+				z-index: 99999 !important; /* Forces it to the absolute top layer */
+				min-width: 200px;
+			}
+
+			/* Ensure the items look like clickable menu options */
+			.support-item {
+				padding: 12px;
+				cursor: pointer;
+				transition: 0.2s;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				color: var(--text);
+			}
+
+			.support-item:hover {
+				background-color: var(--accent) !important;
+				color: white !important;
+			}
 		</style>
 	</head>
 	<body>
-
-	<div class="toolbar">
-		<div style="position: relative; display: inline-block;">
-			<button id="saveMenuBtn" style="background: #2e89ff;">💾 Save As... ▾</button>
-		</div>
-		<button id="openBtn" class="btn-open">📂 Open</button>
+		<div class="toolbar">
+			<div style="position: relative; display: inline-block;">
+				<button id="saveMenuBtn" style="background: #2e89ff;">💾 Save As... ▾</button>
+			</div>
+			<button id="openBtn" class="btn-open">📂 Open</button>
 			<input type="file" id="fileInput" style="display: none;" accept=".txt">
-		<button id="shareBtn" class="btn-share">📤 Share</button>
-		<button id="micBtn" class="btn-voice">🎤 Start Voice</button>
-		<button id="stopMicBtn" class="btn-stop-voice" style="display: none;">🛑 Stop Voice</button>
-		<span id="statusLight" style="width: 12px; height: 12px; background: gray; border-radius: 50%; display: inline-block; margin: 0 5px;">
-		</span>
-		<span id="statusLight"></span>
-		<span id="capsWarning">CAPS ON</span>
-		<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
-		<select id="srcLang">
-			<option value="auto">Auto-Detect</option>
-			<option value="ar-SA">Arabic (Saudi Arabia)</option>
-			<option value="bn-IN">Bengali</option>
-			<option value="zh-CN">Chinese (Mandarin)</option>
-			<option value="en-IN">English (India)</option>
-			<option value="en-US">English (US)</option>
-			<option value="fr-FR">French</option>
-			<option value="de-DE">German</option>
-			<option value="gu-IN">Gujarati</option>
-			<option value="he-IL">Hebrew (Israel)</option>
-			<option value="hi-IN">Hindi</option>
-			<option value="id-ID">Indonesian</option>
-			<option value="it-IT">Italian</option>
-			<option value="ja-JP">Japanese</option>
-			<option value="kn-IN">Kannada</option>
-			<option value="ko-KR">Korean</option>
-			<option value="ms-MY">Malay (Malaysia)</option>
-			<option value="mr-IN">Marathi</option>
-			<option value="ne-NP">Nepali</option>
-			<option value="pt-PT">Portuguese</option>
-			<option value="ru-RU">Russian</option>
-			<option value="es-ES">Spanish</option>
-			<option value="ta-IN">Tamil</option>
-			<option value="te-IN">Telugu</option>
-			<option value="th-TH">Thai</option>
-			<option value="vi-VN">Vietnamese</option>
-		</select>
-		<span>➡️</span>
-		<select id="targetLang">
-			<option value="ar">Arabic</option>
-			<option value="bn">Bengali</option>
-			<option value="zh">Chinese</option>
-			<option value="en">English</option>
-			<option value="fr">French</option>
-			<option value="de">German</option>
-			<option value="gu">Gujarati</option>
-			<option value="he">Hebrew</option>
-			<option value="hi">Hindi</option>
-			<option value="id">Indonesian</option>
-			<option value="it">Italian</option>
-			<option value="ja">Japanese</option>
-			<option value="kn">Kannada</option>
-			<option value="ko">Korean</option>
-			<option value="ms">Malay</option>
-			<option value="mr">Marathi</option>
-			<option value="ne">Nepali</option>
-			<option value="pt">Portuguese</option>
-			<option value="ru">Russian</option>
-			<option value="es">Spanish</option>
-			<option value="ta">Tamil</option>
-			<option value="te">Telugu</option>
-			<option value="th">Thai</option>
-			<option value="vi">Vietnamese</option>
-		</select> 
-		<button id="convertBtn">🔄 Convert</button>
-		<button id="speakBtn">🔊 Speak</button>
-		<button id="stopBtn" style="background:#d13438">🛑 Stop Audio</button>
-		<button id="themeBtn" style="background:#444">🌓 Theme</button>
-		<button id="helpBtn" style="background: #607d8b"> ? Help </button>
-		<button id="creditsBtn" class="btn-credits">ℹ️ Credits</button>
-	</div>
-	<div class="toolbar" id="formatToolbar" style="border-top: none; padding-top: 5px; background: var(--bg);">
-		<button id="boldBtn" title="Bold (Ctrl+B)" style="background: #333;"><b>B</b></button>
-		<button id="italicBtn" title="Italic (Ctrl+I)" style="background: #333;"><i>I</i></button>
-		<button id="underlineBtn" title="Underline (Ctrl+U)" style="background: #333;"><u>U</u></button>
-		<button id="strikeBtn" title="Strike-through" style="background: #333;"><strike>abc</strike></button>
-		<button id="bulletBtn" title="Bullets (Ctrl+Shift+8)" style="background: #333;">• List</button>
-		<button id="upperBtn" title="Make Uppercase" style="background: #444; min-width: 40px;">AA</button>
-		<button id="lowerBtn" title="Make Lowercase" style="background: #444; min-width: 40px;">aa</button>
-		<select id="fontSizeSelect" title="Font Size"></select>
-		<select id="fontStyleSelect" title="Font Style">
-			<option value="Segoe UI">Default Font</option>
-		</select>
-		<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
+			<button id="shareBtn" class="btn-share">📤 Share</button>
+			<button id="micBtn" class="btn-voice">🎤 Start Voice</button>
+			<button id="stopMicBtn" class="btn-stop-voice" style="display: none;">🛑 Stop Voice</button>
+			<span id="statusLight" style="width: 12px; height: 12px; background: gray; border-radius: 50%; display: inline-block; margin: 0 5px;"></span>
+			<span id="statusLight"></span>
+			<span id="capsWarning">CAPS ON</span>
+			<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
+			<select id="srcLang">
+				<option value="auto">Auto-Detect</option>
+				<option value="ar-SA">Arabic (Saudi Arabia)</option>
+				<option value="bn-IN">Bengali</option>
+				<option value="zh-CN">Chinese (Mandarin)</option>
+				<option value="en-IN">English (India)</option>
+				<option value="en-US">English (US)</option>
+				<option value="fr-FR">French</option>
+				<option value="de-DE">German</option>
+				<option value="gu-IN">Gujarati</option>
+				<option value="he-IL">Hebrew (Israel)</option>
+				<option value="hi-IN">Hindi</option>
+				<option value="id-ID">Indonesian</option>
+				<option value="it-IT">Italian</option>
+				<option value="ja-JP">Japanese</option>
+				<option value="kn-IN">Kannada</option>
+				<option value="ko-KR">Korean</option>
+				<option value="ms-MY">Malay (Malaysia)</option>
+				<option value="mr-IN">Marathi</option>
+				<option value="ne-NP">Nepali</option>
+				<option value="pt-PT">Portuguese</option>
+				<option value="ru-RU">Russian</option>
+				<option value="es-ES">Spanish</option>
+				<option value="ta-IN">Tamil</option>
+				<option value="te-IN">Telugu</option>
+				<option value="th-TH">Thai</option>
+				<option value="vi-VN">Vietnamese</option>
+			</select>
+			<span>➡️</span>
+			<select id="targetLang">
+				<option value="ar">Arabic</option>
+				<option value="bn">Bengali</option>
+				<option value="zh">Chinese</option>
+				<option value="en">English</option>
+				<option value="fr">French</option>
+				<option value="de">German</option>
+				<option value="gu">Gujarati</option>
+				<option value="he">Hebrew</option>
+				<option value="hi">Hindi</option>
+				<option value="id">Indonesian</option>
+				<option value="it">Italian</option>
+				<option value="ja">Japanese</option>
+				<option value="kn">Kannada</option>
+				<option value="ko">Korean</option>
+				<option value="ms">Malay</option>
+				<option value="mr">Marathi</option>
+				<option value="ne">Nepali</option>
+				<option value="pt">Portuguese</option>
+				<option value="ru">Russian</option>
+				<option value="es">Spanish</option>
+				<option value="ta">Tamil</option>
+				<option value="te">Telugu</option>
+				<option value="th">Thai</option>
+				<option value="vi">Vietnamese</option>
+			</select> 
+			<button id="convertBtn">🔄 Convert</button>
+			<button id="speakBtn">🔊 Speak</button>
+			<button id="stopBtn" style="background:#d13438">🛑 Stop Audio</button>
+			<button id="themeBtn" style="background:#444">🌓 Theme</button>
+			<button id="helpBtn" style="background: #607d8b"> ? Help </button>
+			<button id="creditsBtn" class="btn-credits">ℹ️ Credits</button>
+		</div>
+		<div class="toolbar" id="formatToolbar" style="border-top: none; padding-top: 5px; background: var(--bg);">
+			<button id="boldBtn" title="Bold (Ctrl+B)" style="background: #333;"><b>B</b></button>
+			<button id="italicBtn" title="Italic (Ctrl+I)" style="background: #333;"><i>I</i></button>
+			<button id="underlineBtn" title="Underline (Ctrl+U)" style="background: #333;"><u>U</u></button>
+			<button id="strikeBtn" title="Strike-through" style="background: #333;"><strike>abc</strike></button>
+			<button id="bulletBtn" title="Bullets (Ctrl+Shift+8)" style="background: #333;">• List</button>
+			<button id="upperBtn" title="Make Uppercase" style="background: #444; min-width: 40px;">AA</button>
+			<button id="lowerBtn" title="Make Lowercase" style="background: #444; min-width: 40px;">aa</button>
+			<select id="fontSizeSelect" title="Font Size"></select>
+			<select id="fontStyleSelect" title="Font Style">
+				<option value="Segoe UI">Default Font</option>
+			</select>
+			<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
 			<button id="alignLeftBtn" title="Align Left (Ctrl+Shift+L)" style="background: #333;">|<</button>
 			<button id="alignCenterBtn" title="Align Center (Ctrl+Shift+E)" style="background: #333;">| - |</button>
 			<button id="alignRightBtn" title="Align Right (Ctrl+Shift+R)" style="background: #333;">>|</button>
 			<button id="paraBtn" title="Insert Paragraph">
 				<b>¶</b> Paragraph
 			</button>	
-		<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
+			<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
 			<button id="colorBtn" title="Text Color" style="background: #333; display: flex; align-items: center; gap: 5px;">
 				<span style="color: #ff5555; border-bottom: 2px solid currentColor;">A</span>
 			</button>
 			<input type="color" id="colorPicker" style="display: none;" value="#2e89ff">
 			<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
-			<button id="toggleExtraBtn" style="background: #673ab7; color: white;">🛠️ Extra Tools ▾</button>		
-		<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
-	</div>
-	<div class="toolbar" id="extraToolbar" style="display: none;">
-		<div id="findContainer" style="display: flex; gap: 5px; align-items: center;">
-			<input type="text" id="findInput" placeholder="Find..." style="width: 120px; padding: 5px; border-radius: 4px; border: 1px solid var(--border); background: #222; color: white;">
+			<button id="toggleExtraBtn" style="background: #673ab7; color: white;">🛠️ Extra Tools ▾</button>
+			<div style="position: relative; display: inline-block; z-index: 10001;">
+				<button id="supportBtn" style="background: #ff9800; color: #000; font-weight: bold;">☕ Support ▾</button>
+			</div>
+			<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
+		</div>
+		<div class="toolbar" id="extraToolbar" style="display: none;">
+			<div id="findContainer" style="display: flex; gap: 5px; align-items: center;">
+				<input type="text" id="findInput" placeholder="Find..." style="width: 120px; padding: 5px; border-radius: 4px; border: 1px solid var(--border); background: #222; color: white;">
 				<button id="findNextBtn" title="Find Next" style="background: #444;">↓</button>
 				<button id="findAllBtn" title="Find All" style="background: #444;">All</button>
 				<span id="findStatus" style="font-size: 11px; color: #888; min-width: 40px;">0/0</span>
-		</div>
-		<div style="width:1px; background:var(--border); height:20px; margin:0 10px;"></div>
-		<button id="clearFormatBtn" style="background: #444;">🧹 Clear</button>
-		<div id="replaceContainer" style="display: flex; gap: 5px; align-items: center;">
-			<input type="text" id="replaceInput" placeholder="Replace with..." style="width: 120px; padding: 5px; border-radius: 4px; border: 1px solid var(--border); background: #222; color: white;">
-			<button id="replaceBtn" title="Replace Current" style="background: #444;">Replace</button>
-			<button id="replaceAllBtn" title="Replace All" style="background: #444;">Replace All</button>
-		</div>
-		<button id="timestampToggle">⏱️ Time: OFF</button>
-		<span id="sessionTimer" style="display:none;">00:00:00</span>
-		<button id="sanitizeNotepadBtn" style="background: #607d8b; color: white;">🧹 Clear Formatting</button>
-		<button id="watermarkBtn" style="background: #009688; color: white;">🖼️ Watermark ▾</button>
-		<button id="autoSaveToggle" style="background: #444; color: white; transition: 0.3s;">🔄 Auto-Save: OFF</button>
-	</div>
-	<div id="notepad" contenteditable="true" spellcheck="true" lang="en"></div>
-	<div id="statusBar" style="background: var(--box); padding: 5px 15px; font-size: 12px; border-top: 1px solid var(--border); display: flex; gap: 20px; color: #888;">
-		<span id="wordCount">Words: 0</span>
-		<span id="charCount">Characters: 0</span>
-	</div>
-	
-	<script src="logic.js"></script>
-	<script src="editor_tools.js"></script>
-	<script src="find.js"></script>
-	<script src="replace.js"></script>
-	<script src="timestamp.js"></script>
-	<script src="clear.js"></script>
-	<script src="watermark.js"></script>
-	<script src="autosave.js"></script>
-	
-	<div id="saveDropdown" style="display: none; position: fixed; background: var(--box); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 9999; min-width: 180px;">
-		<div id="saveTxtBtn" style="padding: 12px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
-			<span>📝 Text (.txt)</span>
-			<span style="opacity: 0.5; font-size: 11px;">Ctrl+S</span>
-		</div>
-		<div id="savePdfBtn" style="padding: 12px; cursor: pointer;">📄 PDF (Print)</div>
-	</div>
-	<div id="helpModal" class="modal-overlay">
-		<div style="background: var(--box); color: var(--text); padding: 25px; border-radius: 15px; border: 2px solid var(--accent); width: 100%; max-width: 650px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center; box-sizing: border-box; overflow: hidden;">
-			
-			<h2 style="margin-top: 0; color: var(--accent); font-size: 26px; border-bottom: 2px solid var(--border); padding-bottom: 10px;">⌨️ User Guide</h2>
-			
-			<div style="display: block; text-align: left; width: 100%;">
-				<ul style="line-height: 1.6; padding-left: 20px; padding-right: 5px; font-size: 15px; margin-top: 15px; white-space: normal; list-style-position: outside;">
-					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Voice Input:</b> Starts transcription at a new line at the end of the file.</li>
-					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Save (Ctrl+S):</b> Opens the "Save As" window and tracks in history.</li>
-					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Timestamps:</b> When ON, press <b>Enter</b> to tag the current recording time.</li>
-					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Focus:</b> The cursor automatically returns to your last position after clicking any tool.</li>
-					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Language 1:</b> Select language for Speech-to-Text transcription.</li>
-					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Convert:</b> Translates entire editor content into <b>Target Language</b>.</li>
-					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Speak:</b> Reads text aloud. If you convert, output voice switches to that language.</li>
-					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word; font-style: italic;">Note: If using a new language first time, voice output may take some time.</li>
-					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Shortcuts:</b> Use <b>Ctrl+B/I/U</b> for Bold, Italic, and Underline.</li>
-					<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Strikethrough:</b> Press <b>Alt+h+4</b> (Win) or <b>Cmd+Shift+X</b> (Mac).</li>
-				</ul>
 			</div>
+			<div style="width:1px; background:var(--border); height:20px; margin:0 10px;"></div>
+			<button id="clearFormatBtn" style="background: #444;">🧹 Clear</button>
+			<div id="replaceContainer" style="display: flex; gap: 5px; align-items: center;">
+				<input type="text" id="replaceInput" placeholder="Replace with..." style="width: 120px; padding: 5px; border-radius: 4px; border: 1px solid var(--border); background: #222; color: white;">
+				<button id="replaceBtn" title="Replace Current" style="background: #444;">Replace</button>
+				<button id="replaceAllBtn" title="Replace All" style="background: #444;">Replace All</button>
+			</div>
+			<button id="timestampToggle">⏱️ Time: OFF</button>
+			<span id="sessionTimer" style="display:none;">00:00:00</span>
+			<button id="sanitizeNotepadBtn" style="background: #607d8b; color: white;">🧹 Clear Formatting</button>
+			<button id="watermarkBtn" style="background: #009688; color: white;">🖼️ Watermark ▾</button>
+			<button id="autoSaveToggle" style="background: #444; color: white; transition: 0.3s;">🔄 Auto-Save: OFF</button>
+		</div>
+		<div id="notepad" contenteditable="true" spellcheck="true" lang="en"></div>
+		<div id="statusBar" style="background: var(--box); padding: 5px 15px; font-size: 12px; border-top: 1px solid var(--border); display: flex; gap: 20px; color: #888;">
+			<span id="wordCount">Words: 0</span>
+			<span id="charCount">Characters: 0</span>
+		</div>
+		
+		<script src="logic.js"></script>
+		<script src="editor_tools.js"></script>
+		<script src="find.js"></script>
+		<script src="replace.js"></script>
+		<script src="timestamp.js"></script>
+		<script src="clear.js"></script>
+		<script src="watermark.js"></script>
+		<script src="autosave.js"></script>
+		
+		<div id="saveDropdown" style="display: none; position: fixed; background: var(--box); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 9999; min-width: 180px;">
+			<div id="saveTxtBtn" style="padding: 12px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
+				<span>📝 Text (.txt)</span>
+				<span style="opacity: 0.5; font-size: 11px;">Ctrl+S</span>
+			</div>
+			<div id="savePdfBtn" style="padding: 12px; cursor: pointer;">📄 PDF (Print)</div>
+		</div>
+		<div id="helpModal" class="modal-overlay">
+			<div style="background: var(--box); color: var(--text); padding: 25px; border-radius: 15px; border: 2px solid var(--accent); width: 100%; max-width: 650px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center; box-sizing: border-box; overflow: hidden;">
+				
+				<h2 style="margin-top: 0; color: var(--accent); font-size: 26px; border-bottom: 2px solid var(--border); padding-bottom: 10px;">⌨️ User Guide</h2>
+				
+				<div style="display: block; text-align: left; width: 100%;">
+					<ul style="line-height: 1.6; padding-left: 20px; padding-right: 5px; font-size: 15px; margin-top: 15px; white-space: normal; list-style-position: outside;">
+						<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Voice Input:</b> Starts transcription at a new line at the end of the file.</li>
+						<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Save (Ctrl+S):</b> Opens the "Save As" window and tracks in history.</li>
+						<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Timestamps:</b> When ON, press <b>Enter</b> to tag the current recording time.</li>
+						<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Focus:</b> The cursor automatically returns to your last position after clicking any tool.</li>
+						<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Language 1:</b> Select language for Speech-to-Text transcription.</li>
+						<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Convert:</b> Translates entire editor content into <b>Target Language</b>.</li>
+						<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Speak:</b> Reads text aloud. If you convert, output voice switches to that language.</li>
+						<li style="margin-bottom: 10px; white-space: normal; word-break: break-word; font-style: italic;">Note: If using a new language first time, voice output may take some time.</li>
+						<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Shortcuts:</b> Use <b>Ctrl+B/I/U</b> for Bold, Italic, and Underline.</li>
+						<li style="margin-bottom: 10px; white-space: normal; word-break: break-word;"><b>Strikethrough:</b> Press <b>Alt+h+4</b> (Win) or <b>Cmd+Shift+X</b> (Mac).</li>
+					</ul>
+				</div>
 
-			<div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap;">
-				<button id="docBtn" style="flex: 1; min-width: 120px; background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 12px;">
-					<a href="https://github.com/WarDragon3399/Web-Translator-Notepad/wiki" target="_blank" class="github-link" style="margin-top: 10px;">📖 Docs</a>
-				</button>
-				<button id="closeHelp" style="flex: 1; min-width: 120px; padding: 12px;">Got it!</button>
+				<div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap;">
+					<button id="docBtn" style="flex: 1; min-width: 120px; background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 12px;">
+						<a href="https://github.com/WarDragon3399/Web-Translator-Notepad/wiki" target="_blank" class="github-link" style="margin-top: 10px;">📖 Docs</a>
+					</button>
+					<button id="closeHelp" style="flex: 1; min-width: 120px; padding: 12px;">Got it!</button>
+				</div>
 			</div>
 		</div>
-	</div>
-	<div id="creditsModal" class="modal-overlay">
-		<div style="background: var(--box); color: var(--text); padding: 30px; border-radius: 15px; border: 2px solid var(--accent); width: 100%; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center;">
-			<h2 style="margin-top: 0; color: var(--accent); font-size: 28px; border-bottom: 2px solid var(--border); padding-bottom: 10px;">💻 Software Info</h2>
-			<div style="margin: 20px 0;">
-				<p style="font-size: 18px; margin-bottom: 5px;"><b>Developed By:</b></p>
-				<p style="font-size: 20px; color: var(--accent); font-weight: bold; margin: 0;">Wardragon3399</p>
+		<div id="creditsModal" class="modal-overlay">
+			<div style="background: var(--box); color: var(--text); padding: 30px; border-radius: 15px; border: 2px solid var(--accent); width: 100%; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center;">
+				<h2 style="margin-top: 0; color: var(--accent); font-size: 28px; border-bottom: 2px solid var(--border); padding-bottom: 10px;">💻 Software Info</h2>
+				<div style="margin: 20px 0;">
+					<p style="font-size: 18px; margin-bottom: 5px;"><b>Developed By:</b></p>
+					<p style="font-size: 20px; color: var(--accent); font-weight: bold; margin: 0;">Wardragon3399</p>
+				</div>
+				<div style="margin-bottom: 25px; font-size: 16px;">
+					<p>© Copyright 2026 | All Rights Reserved</p>
+					<a href="https://github.com/WarDragon3399" target="_blank" class="github-link" style="margin-top: 10px;">📂 View GitHub Profile</a>
+					<span> support via send gift card to wardragon3399@gmail.com </span>
+				</div>
+				<button id="closeCredits" style="width: 100%;">Close</button>
 			</div>
-			<div style="margin-bottom: 25px; font-size: 16px;">
-				<p>© Copyright 2026 | All Rights Reserved</p>
-				<a href="https://github.com/WarDragon3399" target="_blank" class="github-link" style="margin-top: 10px;">📂 View GitHub Profile</a>
-			</div>
-			<button id="closeCredits" style="width: 100%;">Close</button>
 		</div>
-	</div>
-	<div id="watermarkDropdown" style="display: none; position: fixed; background: #242526; border: 1px solid #3a3b3c; border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 20000; min-width: 180px; color: white;">
-		<div id="wmTextOption" style="padding: 6px; cursor: pointer; border-bottom: 1px solid #3a3b3c;">🔤 Text Watermark</div>
-		<div id="wmImageOption" style="padding: 6px; cursor: pointer; border-bottom: 1px solid #3a3b3c;">🖼️ Image Watermark</div>
-		<div id="wmClearOption" style="padding: 6px; cursor: pointer; color: #ff5555;">❌ Remove Watermark</div>
-	</div>
-	<input type="file" id="wmImageInput" style="display: none;" accept="image/*">
-	<div id="printWatermark"></div>
-</body>
+		<div id="watermarkDropdown" style="display: none; position: fixed; background: #242526; border: 1px solid #3a3b3c; border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 20000; min-width: 180px; color: white;">
+			<div id="wmTextOption" style="padding: 6px; cursor: pointer; border-bottom: 1px solid #3a3b3c;">🔤 Text Watermark</div>
+			<div id="wmImageOption" style="padding: 6px; cursor: pointer; border-bottom: 1px solid #3a3b3c;">🖼️ Image Watermark</div>
+			<div id="wmClearOption" style="padding: 6px; cursor: pointer; color: #ff5555;">❌ Remove Watermark</div>
+		</div>
+		<input type="file" id="wmImageInput" style="display: none;" accept="image/*">
+		<div id="printWatermark"></div>
+		<div id="supportDropdown" style="display: none; position: fixed; background: var(--box); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 30000; min-width: 200px; color: var(--text);">
+			<a href="https://amzn.in/d/07cqOwi2" target="_blank" style="text-decoration: none; color: inherit;">
+				<div class="support-item" style="padding: 12px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
+					🎁 <span>Amazon Gift Card</span>
+				</div>
+				<span> send gift card to wardragon3399@gmail.com </span>
+			</a>
+			<a href="https://patreon.com/Wardragon3399?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink" target="_blank" style="text-decoration: none; color: inherit;">
+				<div class="support-item" style="padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M0 .48v23.04h4.22V.48H0zm15.385 0c-4.764 0-8.641 3.88-8.641 8.65 0 4.755 3.877 8.636 8.641 8.636 4.75 0 8.615-3.881 8.615-8.636 0-4.77-3.865-8.65-8.615-8.65z"/>
+					</svg>
+					<span>Patreon</span>
+				</div>
+			</a>
+		</div>
+	</body>
 </html>
