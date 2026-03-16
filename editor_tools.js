@@ -4,6 +4,12 @@
  * Handles text formatting and editor-specific functionality
  */
 
+/**
+ * editor_tools.js 
+ * Developed by: Wardragon3399
+ * Handles text formatting and editor-specific functionality
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
     const notepad = document.getElementById('notepad');
     
@@ -21,11 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	const btnLeft = document.getElementById('alignLeftBtn');
     const btnCenter = document.getElementById('alignCenterBtn');
     const btnRight = document.getElementById('alignRightBtn');
+	const btnPara = document.getElementById('paraBtn');
 	const colorBtn = document.getElementById('colorBtn');
     const colorPicker = document.getElementById('colorPicker');
 	const extraToolbar = document.getElementById('extraToolbar');
     const toggleBtn = document.getElementById('toggleExtraBtn');
-	
+		
 	setTimeout(checkLanguageForCase, 100);
 	let savedRange = null;
 	
@@ -217,6 +224,50 @@ document.addEventListener('DOMContentLoaded', () => {
             sel.addRange(savedRange);
         }
     }
+	
+	//Paragraph Logic
+	
+	// Force the browser to use P tags instead of DIVs
+	document.execCommand('defaultParagraphSeparator', false, 'p');
+	function insertParagraph() {
+		notepad.focus();
+		
+		const selection = window.getSelection();
+		if (!selection.rangeCount) return;
+		const range = selection.getRangeAt(0);
+		
+		// 1. Identify the current block (P or DIV)
+		let container = range.startContainer;
+		if (container.nodeType === 3) container = container.parentNode;
+
+		// 2. Check if the current line is actually empty
+		const isLineEmpty = container.textContent.trim().length === 0 || 
+						   (container.childNodes.length === 1 && container.firstChild.nodeName === 'BR');
+
+		// 3. If line has text, we create a new line first
+		if (!isLineEmpty && container !== notepad) {
+			// If text is selected, we want to "push" it to the new indented line
+			// insertParagraph handles the break perfectly
+			document.execCommand('insertParagraph', false, null);
+		}
+
+		// 4. Insert the 4 indent spaces
+		const indent = document.createTextNode("\u00a0\u00a0\u00a0\u00a0");
+		
+		// Get the fresh range (where the cursor is now)
+		const freshRange = window.getSelection().getRangeAt(0);
+		
+		// CRITICAL: Collapse to start so we don't erase selected text
+		freshRange.collapse(true); 
+		
+		freshRange.insertNode(indent);
+
+		// 5. Place cursor exactly after the indent
+		freshRange.setStartAfter(indent);
+		freshRange.setEndAfter(indent);
+		selection.removeAllRanges();
+		selection.addRange(freshRange);
+	}
 
     // --- LISTENERS ---
     btnBold.addEventListener('click', () => format('bold'));
@@ -249,6 +300,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	// for font Style LISTENERS
 	// Re-filter fonts when the user changes the writing language
     srcLang.addEventListener('change', loadSystemFonts);
+	
+	// ParagraphListener for 
+	btnPara.addEventListener('click', (e) => {
+		e.preventDefault();
+		insertParagraph();
+	});
 	
 	//for font color LISTENERS
 	colorBtn.addEventListener('click', (e) => {
@@ -359,8 +416,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.key.toLowerCase() === 'l') { e.preventDefault(); formatAlign('justifyLeft'); }
             if (e.key.toLowerCase() === 'e') { e.preventDefault(); formatAlign('justifyCenter'); }
             if (e.key.toLowerCase() === 'r') { e.preventDefault(); formatAlign('justifyRight'); }
-        }	
-		
+        }			
     });
 	
+	//Paragraph Shortcut key Tab
+	notepad.addEventListener('keydown', (e) => {
+		if (e.key === 'Tab') {
+			e.preventDefault(); 
+
+			const selection = window.getSelection();
+			if (!selection.rangeCount) return;
+			const range = selection.getRangeAt(0);
+
+			// Insert 4 non-breaking spaces
+			const tabNode = document.createTextNode("\u00a0\u00a0\u00a0\u00a0");
+			range.insertNode(tabNode);
+
+			// Move cursor to the end of the spaces
+			range.setStartAfter(tabNode);
+			range.setEndAfter(tabNode); 
+			selection.removeAllRanges();
+			selection.addRange(range);
+		}
+	});
 });
