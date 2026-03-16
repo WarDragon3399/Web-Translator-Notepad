@@ -4,12 +4,6 @@
  * Handles text formatting and editor-specific functionality
  */
 
-/**
- * editor_tools.js 
- * Developed by: Wardragon3399
- * Handles text formatting and editor-specific functionality
- */
-
 document.addEventListener('DOMContentLoaded', () => {
     const notepad = document.getElementById('notepad');
     
