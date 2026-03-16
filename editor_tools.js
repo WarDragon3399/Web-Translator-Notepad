@@ -262,6 +262,34 @@ document.addEventListener('DOMContentLoaded', () => {
 		selection.removeAllRanges();
 		selection.addRange(freshRange);
 	}
+	
+	function removeIndent() {
+		notepad.focus();
+		const selection = window.getSelection();
+		if (!selection.rangeCount) return;
+		
+		const range = selection.getRangeAt(0);
+		let container = range.startContainer;
+		
+		// If we are in a text node, get the parent (P or DIV)
+		let block = container.nodeType === 3 ? container.parentNode : container;
+		
+		// Get the text content of the current line
+		let content = block.innerHTML;
+		const indentMarkup = "&nbsp;&nbsp;&nbsp;&nbsp;"; // What 4 \u00a0 look like in innerHTML
+
+		// If the line starts with our indent, remove it
+		if (content.startsWith(indentMarkup)) {
+			block.innerHTML = content.substring(indentMarkup.length);
+			
+			// Reset cursor to the start of the line after removing
+			const newRange = document.createRange();
+			newRange.setStart(block, 0);
+			newRange.collapse(true);
+			selection.removeAllRanges();
+			selection.addRange(newRange);
+		}
+	}
 
     // --- LISTENERS ---
     btnBold.addEventListener('click', () => format('bold'));
@@ -415,22 +443,19 @@ document.addEventListener('DOMContentLoaded', () => {
 	
 	//Paragraph Shortcut key Tab
 	notepad.addEventListener('keydown', (e) => {
-		if (e.key === 'Tab') {
+		const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+		const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+
+		// --- TAB (Indent) ---
+		if (e.key === 'Tab' && !e.shiftKey) {
 			e.preventDefault(); 
+			insertParagraph(); // Reuse your smart indent function
+		}
 
-			const selection = window.getSelection();
-			if (!selection.rangeCount) return;
-			const range = selection.getRangeAt(0);
-
-			// Insert 4 non-breaking spaces
-			const tabNode = document.createTextNode("\u00a0\u00a0\u00a0\u00a0");
-			range.insertNode(tabNode);
-
-			// Move cursor to the end of the spaces
-			range.setStartAfter(tabNode);
-			range.setEndAfter(tabNode); 
-			selection.removeAllRanges();
-			selection.addRange(range);
+		// --- CTRL + SHIFT + TAB (Remove Indent) ---
+		if (e.key === 'Tab' && e.shiftKey) {
+			e.preventDefault();
+			removeIndent();
 		}
 	});
 });
