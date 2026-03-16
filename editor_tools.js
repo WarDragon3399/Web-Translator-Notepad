@@ -1,461 +1,497 @@
-/**
- * editor_tools.js 
- * Developed by: Wardragon3399
- * Handles text formatting and editor-specific functionality
- */
+	/**
+	 * editor_tools.js 
+	 * Developed by: Wardragon3399
+	 * Handles text formatting and editor-specific functionality
+	 */
 
-document.addEventListener('DOMContentLoaded', () => {
-    const notepad = document.getElementById('notepad');
-    
-    // Select our buttons
-    const btnBold = document.getElementById('boldBtn');
-    const btnItalic = document.getElementById('italicBtn');
-    const btnUnderline = document.getElementById('underlineBtn');
-    const btnStrike = document.getElementById('strikeBtn');
-	const btnBullet = document.getElementById('bulletBtn');
-	const upperBtn = document.getElementById('upperBtn');
-    const lowerBtn = document.getElementById('lowerBtn');
-	const fontSizeSelect = document.getElementById('fontSizeSelect');
-	const fontSelect = document.getElementById('fontStyleSelect');	
-	const srcLang = document.getElementById('srcLang');
-	const btnLeft = document.getElementById('alignLeftBtn');
-    const btnCenter = document.getElementById('alignCenterBtn');
-    const btnRight = document.getElementById('alignRightBtn');
-	const btnPara = document.getElementById('paraBtn');
-	const colorBtn = document.getElementById('colorBtn');
-    const colorPicker = document.getElementById('colorPicker');
-	const extraToolbar = document.getElementById('extraToolbar');
-    const toggleBtn = document.getElementById('toggleExtraBtn');
+	document.addEventListener('DOMContentLoaded', () => {
+		const notepad = document.getElementById('notepad');
 		
-	setTimeout(checkLanguageForCase, 100);
-	let savedRange = null;
-	
-    function format(command) {
-        document.execCommand(command, false, null);
-        notepad.focus();
-        updateToolbar(); // Check states immediately after click
-    }
-
-    // Function to check if Bold/Italic etc are active at cursor position
-    function updateToolbar() {
-        if (document.queryCommandState('bold')) btnBold.classList.add('format-active');
-        else btnBold.classList.remove('format-active');
-
-        if (document.queryCommandState('italic')) btnItalic.classList.add('format-active');
-        else btnItalic.classList.remove('format-active');
-
-        if (document.queryCommandState('underline')) btnUnderline.classList.add('format-active');
-        else btnUnderline.classList.remove('format-active');
-
-        if (document.queryCommandState('strikeThrough')) btnStrike.classList.add('format-active');
-        else btnStrike.classList.remove('format-active');
+		// Select our buttons
+		const btnBold = document.getElementById('boldBtn');
+		const btnItalic = document.getElementById('italicBtn');
+		const btnUnderline = document.getElementById('underlineBtn');
+		const btnStrike = document.getElementById('strikeBtn');
+		const btnBullet = document.getElementById('bulletBtn');
+		const upperBtn = document.getElementById('upperBtn');
+		const lowerBtn = document.getElementById('lowerBtn');
+		const fontSizeSelect = document.getElementById('fontSizeSelect');
+		const fontSelect = document.getElementById('fontStyleSelect');	
+		const srcLang = document.getElementById('srcLang');
+		const btnLeft = document.getElementById('alignLeftBtn');
+		const btnCenter = document.getElementById('alignCenterBtn');
+		const btnRight = document.getElementById('alignRightBtn');
+		const btnPara = document.getElementById('paraBtn');
+		const colorBtn = document.getElementById('colorBtn');
+		const colorPicker = document.getElementById('colorPicker');
+		const extraToolbar = document.getElementById('extraToolbar');
+		const toggleBtn = document.getElementById('toggleExtraBtn');
+		const supportBtn = document.getElementById('supportBtn');
+		const supportDropdown = document.getElementById('supportDropdown');
 		
-		if (document.queryCommandState('insertUnorderedList')) btnBullet.classList.add('format-active');
-        else btnBullet.classList.remove('format-active');
-    }
-	
-	//for Casechanger 
-	// 1. Function to handle Case Change
-    function changeCase(type) {
-        const selection = window.getSelection();
-        if (!selection.rangeCount || selection.toString().length === 0) return;
-
-        const selectedText = selection.toString();
-        const replacementText = (type === 'upper') 
-            ? selectedText.toUpperCase() 
-            : selectedText.toLowerCase();
-
-        // Using insertText maintains the undo/redo buffer
-        document.execCommand('insertText', false, replacementText);
-        notepad.focus();
-    }
-
-    // 2. Function to enable/disable buttons based on Language
-    function checkLanguageForCase() {
-        const lang = srcLang.value; 
-        
-        // Enable if language is English (en), OR if it's set to 'auto' 
-        // because auto-detect often handles English.
-        if (lang.startsWith('en') || lang === 'auto') {
-            upperBtn.style.opacity = "1";
-            upperBtn.style.pointerEvents = "auto";
-            upperBtn.style.filter = "grayscale(0%)";
-            
-            lowerBtn.style.opacity = "1";
-            lowerBtn.style.pointerEvents = "auto";
-            lowerBtn.style.filter = "grayscale(0%)";
-        } else {
-            // Disable for Gujarati, Hindi, etc.
-            upperBtn.style.opacity = "0.3";
-            upperBtn.style.pointerEvents = "none";
-            upperBtn.style.filter = "grayscale(100%)";
-            
-            lowerBtn.style.opacity = "0.3";
-            lowerBtn.style.pointerEvents = "none";
-            lowerBtn.style.filter = "grayscale(100%)";
-        }
-    }
-	
-	//for font size
-	function populateFontSizes() {
-        // Clear existing options
-        fontSizeSelect.innerHTML = '';
-
-        // Check if user is on mobile
-        const isMobile = window.innerWidth <= 600;
-
-        let sizes;
-        if (isMobile) {
-            // Mobile-friendly sizes only
-            sizes = [
-                { label: "Small", value: "2" },
-                { label: "Normal", value: "3" },
-                { label: "Large", value: "4" }
-            ];
-        } 
-		else {
-            // Full desktop range
-            sizes = [
-                { label: "Tiny", value: "1" },
-                { label: "Small", value: "2" },
-                { label: "Normal", value: "3" },
-                { label: "Medium", value: "4" },
-                { label: "Large", value: "5" },
-                { label: "Huge", value: "6" },
-                { label: "Maximum", value: "7" }
-            ];
-        }
-
-        sizes.forEach(size => {
-            const option = document.createElement('option');
-            option.value = size.value;
-            option.text = size.label;
-            // Set 'Normal' as default
-            if (size.label === "Normal") option.selected = true;
-            fontSizeSelect.appendChild(option);
-        });
-    }
-
-	//for font Style
-	async function loadSystemFonts() {
-        if (!window.queryLocalFonts) {
-            console.warn("Local Font Access API not supported. Using web-safe fonts.");
-            return populateWebSafeFonts();
-        }
-
-        try {
-            const status = await navigator.permissions.query({ name: 'local-fonts' });
-            if (status.state === 'denied') return populateWebSafeFonts();
-
-            const fonts = await window.queryLocalFonts();
-            updateFontList(fonts);
-        } catch (err) {
-            console.error(err);
-        }
-    }
-
-    function updateFontList(fonts) {
-        const currentLang = srcLang.value.split('-')[0]; // e.g., 'gu' from 'gu-IN'
-        fontSelect.innerHTML = '<option value="inherit">Default Font</option>';
-
-        // Filter fonts that match the language script
-        // Note: Browsers don't give "Language" metadata easily, 
-        // so we check if the font name contains language keywords
-        const filtered = fonts.filter(f => {
-            const name = f.fullName.toLowerCase();
-            if (currentLang === 'gu') return name.includes('gujarati') || name.includes('shruti');
-            if (currentLang === 'hi') return name.includes('hindi') || name.includes('mangal') || name.includes('devanagari');
-            if (currentLang === 'ar') return name.includes('arabic');
-            return true; // Show all for English/Others
-        });
-
-        // Limit to first 50 to keep the menu fast
-        filtered.slice(0, 700).forEach(font => {
-            const opt = document.createElement('option');
-            opt.value = font.family;
-            opt.textContent = font.fullName;
-            fontSelect.appendChild(opt);
-        });
-    }
-
-    function populateWebSafeFonts() {
-        const generic = ["Arial", "Verdana", "Times New Roman", "Courier New", "Georgia"];
-        generic.forEach(f => {
-            const opt = document.createElement('option');
-            opt.value = opt.textContent = f;
-            fontSelect.appendChild(opt);
-        });
-    }
-
-    // Apply font change
-    fontSelect.addEventListener('change', () => {
-        document.execCommand('fontName', false, fontSelect.value);
-        notepad.focus();
-    });
-
-	//text allignment
-	// Reuse your format function
-    function formatAlign(command) {
-        document.execCommand(command, false, null);
-        notepad.focus();
-        updateToolbar();
-    }
-
-	//Font Color picker
-	// Helper to save where the user was highlighting
-    function saveSelection() {
-        const sel = window.getSelection();
-        if (sel.getRangeAt && sel.rangeCount) {
-           savedRange = sel.getRangeAt(0).cloneRange();
-        }
-    }
-
-    // Helper to put the highlight back
-    function restoreSelection() {
-        if (savedRange) {
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(savedRange);
-        }
-    }
-	
-	//Paragraph Logic
-	
-	// Force the browser to use P tags instead of DIVs
-	document.execCommand('defaultParagraphSeparator', false, 'p');
-	function insertParagraph() {
-		notepad.focus();
+		setTimeout(checkLanguageForCase, 100);
+		let savedRange = null;
 		
-		const selection = window.getSelection();
-		if (!selection.rangeCount) return;
-		const range = selection.getRangeAt(0);
-		
-		// 1. Identify the current block (P or DIV)
-		let container = range.startContainer;
-		if (container.nodeType === 3) container = container.parentNode;
-
-		// 2. Check if the current line is actually empty
-		const isLineEmpty = container.textContent.trim().length === 0 || 
-						   (container.childNodes.length === 1 && container.firstChild.nodeName === 'BR');
-
-		// 3. If line has text, we create a new line first
-		if (!isLineEmpty && container !== notepad) {
-			// If text is selected, we want to "push" it to the new indented line
-			// insertParagraph handles the break perfectly
-			document.execCommand('insertParagraph', false, null);
+		function format(command) {
+			document.execCommand(command, false, null);
+			notepad.focus();
+			updateToolbar(); // Check states immediately after click
 		}
 
-		// 4. Insert the 4 indent spaces
-		const indent = document.createTextNode("\u00a0\u00a0\u00a0\u00a0");
-		
-		// Get the fresh range (where the cursor is now)
-		const freshRange = window.getSelection().getRangeAt(0);
-		
-		// CRITICAL: Collapse to start so we don't erase selected text
-		freshRange.collapse(true); 
-		
-		freshRange.insertNode(indent);
+		// Function to check if Bold/Italic etc are active at cursor position
+		function updateToolbar() {
+			if (document.queryCommandState('bold')) btnBold.classList.add('format-active');
+			else btnBold.classList.remove('format-active');
 
-		// 5. Place cursor exactly after the indent
-		freshRange.setStartAfter(indent);
-		freshRange.setEndAfter(indent);
-		selection.removeAllRanges();
-		selection.addRange(freshRange);
-	}
-	
-	function removeIndent() {
-		notepad.focus();
-		const selection = window.getSelection();
-		if (!selection.rangeCount) return;
-		
-		const range = selection.getRangeAt(0);
-		let container = range.startContainer;
-		
-		// If we are in a text node, get the parent (P or DIV)
-		let block = container.nodeType === 3 ? container.parentNode : container;
-		
-		// Get the text content of the current line
-		let content = block.innerHTML;
-		const indentMarkup = "&nbsp;&nbsp;&nbsp;&nbsp;"; // What 4 \u00a0 look like in innerHTML
+			if (document.queryCommandState('italic')) btnItalic.classList.add('format-active');
+			else btnItalic.classList.remove('format-active');
 
-		// If the line starts with our indent, remove it
-		if (content.startsWith(indentMarkup)) {
-			block.innerHTML = content.substring(indentMarkup.length);
+			if (document.queryCommandState('underline')) btnUnderline.classList.add('format-active');
+			else btnUnderline.classList.remove('format-active');
+
+			if (document.queryCommandState('strikeThrough')) btnStrike.classList.add('format-active');
+			else btnStrike.classList.remove('format-active');
 			
-			// Reset cursor to the start of the line after removing
-			const newRange = document.createRange();
-			newRange.setStart(block, 0);
-			newRange.collapse(true);
+			if (document.queryCommandState('insertUnorderedList')) btnBullet.classList.add('format-active');
+			else btnBullet.classList.remove('format-active');
+		}
+		
+		//for Casechanger 
+		// 1. Function to handle Case Change
+		function changeCase(type) {
+			const selection = window.getSelection();
+			if (!selection.rangeCount || selection.toString().length === 0) return;
+
+			const selectedText = selection.toString();
+			const replacementText = (type === 'upper') 
+				? selectedText.toUpperCase() 
+				: selectedText.toLowerCase();
+
+			// Using insertText maintains the undo/redo buffer
+			document.execCommand('insertText', false, replacementText);
+			notepad.focus();
+		}
+
+		// 2. Function to enable/disable buttons based on Language
+		function checkLanguageForCase() {
+			const lang = srcLang.value; 
+			
+			// Enable if language is English (en), OR if it's set to 'auto' 
+			// because auto-detect often handles English.
+			if (lang.startsWith('en') || lang === 'auto') {
+				upperBtn.style.opacity = "1";
+				upperBtn.style.pointerEvents = "auto";
+				upperBtn.style.filter = "grayscale(0%)";
+				
+				lowerBtn.style.opacity = "1";
+				lowerBtn.style.pointerEvents = "auto";
+				lowerBtn.style.filter = "grayscale(0%)";
+			} else {
+				// Disable for Gujarati, Hindi, etc.
+				upperBtn.style.opacity = "0.3";
+				upperBtn.style.pointerEvents = "none";
+				upperBtn.style.filter = "grayscale(100%)";
+				
+				lowerBtn.style.opacity = "0.3";
+				lowerBtn.style.pointerEvents = "none";
+				lowerBtn.style.filter = "grayscale(100%)";
+			}
+		}
+		
+		//for font size
+		function populateFontSizes() {
+			// Clear existing options
+			fontSizeSelect.innerHTML = '';
+
+			// Check if user is on mobile
+			const isMobile = window.innerWidth <= 600;
+
+			let sizes;
+			if (isMobile) {
+				// Mobile-friendly sizes only
+				sizes = [
+					{ label: "Small", value: "2" },
+					{ label: "Normal", value: "3" },
+					{ label: "Large", value: "4" }
+				];
+			} 
+			else {
+				// Full desktop range
+				sizes = [
+					{ label: "Tiny", value: "1" },
+					{ label: "Small", value: "2" },
+					{ label: "Normal", value: "3" },
+					{ label: "Medium", value: "4" },
+					{ label: "Large", value: "5" },
+					{ label: "Huge", value: "6" },
+					{ label: "Maximum", value: "7" }
+				];
+			}
+
+			sizes.forEach(size => {
+				const option = document.createElement('option');
+				option.value = size.value;
+				option.text = size.label;
+				// Set 'Normal' as default
+				if (size.label === "Normal") option.selected = true;
+				fontSizeSelect.appendChild(option);
+			});
+		}
+
+		//for font Style
+		async function loadSystemFonts() {
+			if (!window.queryLocalFonts) {
+				console.warn("Local Font Access API not supported. Using web-safe fonts.");
+				return populateWebSafeFonts();
+			}
+
+			try {
+				const status = await navigator.permissions.query({ name: 'local-fonts' });
+				if (status.state === 'denied') return populateWebSafeFonts();
+
+				const fonts = await window.queryLocalFonts();
+				updateFontList(fonts);
+			} catch (err) {
+				console.error(err);
+			}
+		}
+
+		function updateFontList(fonts) {
+			const currentLang = srcLang.value.split('-')[0]; // e.g., 'gu' from 'gu-IN'
+			fontSelect.innerHTML = '<option value="inherit">Default Font</option>';
+
+			// Filter fonts that match the language script
+			// Note: Browsers don't give "Language" metadata easily, 
+			// so we check if the font name contains language keywords
+			const filtered = fonts.filter(f => {
+				const name = f.fullName.toLowerCase();
+				if (currentLang === 'gu') return name.includes('gujarati') || name.includes('shruti');
+				if (currentLang === 'hi') return name.includes('hindi') || name.includes('mangal') || name.includes('devanagari');
+				if (currentLang === 'ar') return name.includes('arabic');
+				return true; // Show all for English/Others
+			});
+
+			// Limit to first 50 to keep the menu fast
+			filtered.slice(0, 700).forEach(font => {
+				const opt = document.createElement('option');
+				opt.value = font.family;
+				opt.textContent = font.fullName;
+				fontSelect.appendChild(opt);
+			});
+		}
+
+		function populateWebSafeFonts() {
+			const generic = ["Arial", "Verdana", "Times New Roman", "Courier New", "Georgia"];
+			generic.forEach(f => {
+				const opt = document.createElement('option');
+				opt.value = opt.textContent = f;
+				fontSelect.appendChild(opt);
+			});
+		}
+
+		// Apply font change
+		fontSelect.addEventListener('change', () => {
+			document.execCommand('fontName', false, fontSelect.value);
+			notepad.focus();
+		});
+
+		//text allignment
+		// Reuse your format function
+		function formatAlign(command) {
+			document.execCommand(command, false, null);
+			notepad.focus();
+			updateToolbar();
+		}
+
+		//Font Color picker
+		// Helper to save where the user was highlighting
+		function saveSelection() {
+			const sel = window.getSelection();
+			if (sel.getRangeAt && sel.rangeCount) {
+			   savedRange = sel.getRangeAt(0).cloneRange();
+			}
+		}
+
+		// Helper to put the highlight back
+		function restoreSelection() {
+			if (savedRange) {
+				const sel = window.getSelection();
+				sel.removeAllRanges();
+				sel.addRange(savedRange);
+			}
+		}
+		
+		//Paragraph Logic
+		
+		// Force the browser to use P tags instead of DIVs
+		document.execCommand('defaultParagraphSeparator', false, 'p');
+		function insertParagraph() {
+			notepad.focus();
+			
+			const selection = window.getSelection();
+			if (!selection.rangeCount) return;
+			const range = selection.getRangeAt(0);
+			
+			// 1. Identify the current block (P or DIV)
+			let container = range.startContainer;
+			if (container.nodeType === 3) container = container.parentNode;
+
+			// 2. Check if the current line is actually empty
+			const isLineEmpty = container.textContent.trim().length === 0 || 
+							   (container.childNodes.length === 1 && container.firstChild.nodeName === 'BR');
+
+			// 3. If line has text, we create a new line first
+			if (!isLineEmpty && container !== notepad) {
+				// If text is selected, we want to "push" it to the new indented line
+				// insertParagraph handles the break perfectly
+				document.execCommand('insertParagraph', false, null);
+			}
+
+			// 4. Insert the 4 indent spaces
+			const indent = document.createTextNode("\u00a0\u00a0\u00a0\u00a0");
+			
+			// Get the fresh range (where the cursor is now)
+			const freshRange = window.getSelection().getRangeAt(0);
+			
+			// CRITICAL: Collapse to start so we don't erase selected text
+			freshRange.collapse(true); 
+			
+			freshRange.insertNode(indent);
+
+			// 5. Place cursor exactly after the indent
+			freshRange.setStartAfter(indent);
+			freshRange.setEndAfter(indent);
 			selection.removeAllRanges();
-			selection.addRange(newRange);
+			selection.addRange(freshRange);
 		}
-	}
-
-    // --- LISTENERS ---
-    btnBold.addEventListener('click', () => format('bold'));
-    btnItalic.addEventListener('click', () => format('italic'));
-    btnUnderline.addEventListener('click', () => format('underline'));
-    btnStrike.addEventListener('click', () => format('strikeThrough'));
-	btnBullet.addEventListener('click', () => format('insertUnorderedList'));
-	upperBtn.addEventListener('click', () => changeCase('upper'));
-    lowerBtn.addEventListener('click', () => changeCase('lower'));
-    srcLang.addEventListener('change', checkLanguageForCase);
-	btnLeft.addEventListener('click', () => formatAlign('justifyLeft'));
-    btnCenter.addEventListener('click', () => formatAlign('justifyCenter'));
-    btnRight.addEventListener('click', () => formatAlign('justifyRight'));
-	
-    // Update buttons whenever the user clicks or moves the cursor in the notepad
-    notepad.addEventListener('keyup', updateToolbar);
-    notepad.addEventListener('mouseup', updateToolbar);
-	
-	//for font size LISTENERS
-	// Run on load and when window is resized
-    populateFontSizes();
-    window.addEventListener('resize', populateFontSizes);
-
-    // Apply font size change
-    fontSizeSelect.addEventListener('change', () => {
-        document.execCommand('fontSize', false, fontSizeSelect.value);
-        notepad.focus();
-    });
-	
-	// for font Style LISTENERS
-	// Re-filter fonts when the user changes the writing language
-    srcLang.addEventListener('change', loadSystemFonts);
-	
-	// ParagraphListener for 
-	btnPara.addEventListener('click', (e) => {
-		e.preventDefault();
-		insertParagraph();
-	});
-	
-	//for font color LISTENERS
-	colorBtn.addEventListener('click', (e) => {
-		e.preventDefault();
-		saveSelection(); // Capture exactly what is highlighted RIGHT NOW
-		colorPicker.click();
-	});
-
-   colorPicker.addEventListener('input', (e) => {
-		const selectedColor = e.target.value;
-		colorBtn.querySelector('span').style.color = selectedColor;
 		
-		// Only apply during 'input' if we are on Desktop
-		if (window.innerWidth > 600) {
+		function removeIndent() {
+			notepad.focus();
+			const selection = window.getSelection();
+			if (!selection.rangeCount) return;
+			
+			const range = selection.getRangeAt(0);
+			let container = range.startContainer;
+			
+			// If we are in a text node, get the parent (P or DIV)
+			let block = container.nodeType === 3 ? container.parentNode : container;
+			
+			// Get the text content of the current line
+			let content = block.innerHTML;
+			const indentMarkup = "&nbsp;&nbsp;&nbsp;&nbsp;"; // What 4 \u00a0 look like in innerHTML
+
+			// If the line starts with our indent, remove it
+			if (content.startsWith(indentMarkup)) {
+				block.innerHTML = content.substring(indentMarkup.length);
+				
+				// Reset cursor to the start of the line after removing
+				const newRange = document.createRange();
+				newRange.setStart(block, 0);
+				newRange.collapse(true);
+				selection.removeAllRanges();
+				selection.addRange(newRange);
+			}
+		}
+		
+		supportBtn.addEventListener('click', (e) => {
+			e.stopPropagation();
+
+			// Check if it's already open
+			if (supportDropdown.style.display === 'block') {
+				supportDropdown.style.display = 'none';
+				return;
+			}
+
+			// 1. Get the position of the button
+			const rect = supportBtn.getBoundingClientRect();
+
+			// 2. Position the dropdown right under the button
+			// rect.bottom is the bottom of the button
+			// rect.left is the left side of the button
+			supportDropdown.style.top = `${rect.bottom + 5}px`;
+			supportDropdown.style.left = `${rect.left}px`;
+
+			// 3. Show it
+			supportDropdown.style.display = 'block';
+
+			// Optional: If the dropdown goes off-screen to the right, shift it
+			const dropdownRect = supportDropdown.getBoundingClientRect();
+			if (dropdownRect.right > window.innerWidth) {
+				supportDropdown.style.left = `${window.innerWidth - dropdownRect.width - 10}px`;
+			}
+		});
+
+    // Close when clicking anywhere else
+    window.addEventListener('click', () => {
+        if (supportDropdown) supportDropdown.style.display = 'none';
+    });
+		
+
+		// --- LISTENERS ---
+		btnBold.addEventListener('click', () => format('bold'));
+		btnItalic.addEventListener('click', () => format('italic'));
+		btnUnderline.addEventListener('click', () => format('underline'));
+		btnStrike.addEventListener('click', () => format('strikeThrough'));
+		btnBullet.addEventListener('click', () => format('insertUnorderedList'));
+		upperBtn.addEventListener('click', () => changeCase('upper'));
+		lowerBtn.addEventListener('click', () => changeCase('lower'));
+		srcLang.addEventListener('change', checkLanguageForCase);
+		btnLeft.addEventListener('click', () => formatAlign('justifyLeft'));
+		btnCenter.addEventListener('click', () => formatAlign('justifyCenter'));
+		btnRight.addEventListener('click', () => formatAlign('justifyRight'));
+		
+		// Update buttons whenever the user clicks or moves the cursor in the notepad
+		notepad.addEventListener('keyup', updateToolbar);
+		notepad.addEventListener('mouseup', updateToolbar);
+		
+		//for font size LISTENERS
+		// Run on load and when window is resized
+		populateFontSizes();
+		window.addEventListener('resize', populateFontSizes);
+
+		// Apply font size change
+		fontSizeSelect.addEventListener('change', () => {
+			document.execCommand('fontSize', false, fontSizeSelect.value);
+			notepad.focus();
+		});
+		
+		// for font Style LISTENERS
+		// Re-filter fonts when the user changes the writing language
+		srcLang.addEventListener('change', loadSystemFonts);
+		
+		// ParagraphListener for 
+		btnPara.addEventListener('click', (e) => {
+			e.preventDefault();
+			insertParagraph();
+		});
+		
+		//for font color LISTENERS
+		colorBtn.addEventListener('click', (e) => {
+			e.preventDefault();
+			saveSelection(); // Capture exactly what is highlighted RIGHT NOW
+			colorPicker.click();
+		});
+
+	   colorPicker.addEventListener('input', (e) => {
+			const selectedColor = e.target.value;
+			colorBtn.querySelector('span').style.color = selectedColor;
+			
+			// Only apply during 'input' if we are on Desktop
+			if (window.innerWidth > 600) {
+				restoreSelection();
+				document.execCommand('foreColor', false, selectedColor);
+			}
+		});
+
+		// Also apply on 'change' to ensure it locks in on mobile
+	   colorPicker.addEventListener('change', (e) => {
+			const selectedColor = e.target.value;
+			
+			// Update the UI icon color
+			colorBtn.querySelector('span').style.color = selectedColor;
+			
+			// Force focus back to notepad FIRST
+			notepad.focus(); 
+			
+			// Re-highlight the text that was selected before the picker opened
 			restoreSelection();
+			
+			// Apply the color
 			document.execCommand('foreColor', false, selectedColor);
-		}
+			
+			// Cleanup
+			savedRange = null; 
+			console.log("Color applied to mobile selection");
+		});
+		
+		// Toggle the 3rd Menu
+		toggleBtn.addEventListener('click', () => {
+			if (extraToolbar.style.display === 'none') {
+				extraToolbar.style.display = 'flex';
+				toggleBtn.innerHTML = '🛠️ Extra Tools ▴';
+				toggleBtn.style.background = 'var(--accent)';
+			} else {
+				extraToolbar.style.display = 'none';
+				toggleBtn.innerHTML = '🛠️ Extra Tools ▾';
+				toggleBtn.style.background = '#673ab7';
+			}
+		});
+		
+		// Initial load
+		loadSystemFonts();
+		
+		// Run once on load
+		checkLanguageForCase();
+		
+		// --- KEYBOARD SHORTCUTS FOR FORMATTING ---
+	   // To handle Alt + H + 4, we need to track if H was pressed while Alt was down
+		let altHPressed = false;
+
+		document.addEventListener('keydown', (e) => {
+			if (document.activeElement !== notepad) return;
+
+			const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+			const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+			const key = e.key.toLowerCase();
+
+			// 1. Standard Shortcuts
+			if (ctrlOrCmd && key === 'b') { e.preventDefault(); format('bold'); }
+			if (ctrlOrCmd && key === 'i') { e.preventDefault(); format('italic'); }
+			if (ctrlOrCmd && key === 'u') { e.preventDefault(); format('underline'); }
+
+			// 2. Strikethrough for MAC: Cmd + Shift + X
+			if (isMac && ctrlOrCmd && e.shiftKey && key === 'x') {
+				e.preventDefault();
+				format('strikeThrough');
+			}
+
+			// 3. Strikethrough for WINDOWS: Alt + H + 4
+			if (!isMac) {
+				// Check if user is holding Alt and presses H
+				if (e.altKey && key === 'h') {
+					e.preventDefault(); // Stop browser help menu
+					altHPressed = true;
+					
+					// Reset the tracker after 1 second if 4 isn't pressed
+					setTimeout(() => { altHPressed = false; }, 1000);
+				}
+
+				// If Alt+H was just pressed and the user now hits 4
+				if (altHPressed && key === '4') {
+					e.preventDefault();
+					format('strikeThrough');
+					altHPressed = false; // Reset
+				}
+			}
+			// 4. Bullet Shortcut: Ctrl/Cmd + Shift + 8
+			if (ctrlOrCmd && e.shiftKey && e.key.toLowerCase() === '*') {
+				e.preventDefault();
+				format('insertUnorderedList');
+			}
+			
+			// 5. Allignment Shortcut keys
+			if (ctrlOrCmd && e.shiftKey) {
+				if (e.key.toLowerCase() === 'l') { e.preventDefault(); formatAlign('justifyLeft'); }
+				if (e.key.toLowerCase() === 'e') { e.preventDefault(); formatAlign('justifyCenter'); }
+				if (e.key.toLowerCase() === 'r') { e.preventDefault(); formatAlign('justifyRight'); }
+			}			
+		});
+		
+		//Paragraph Shortcut key Tab
+		notepad.addEventListener('keydown', (e) => {
+			const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+			const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+
+			// --- TAB (Indent) ---
+			if (e.key === 'Tab' && !e.shiftKey) {
+				e.preventDefault(); 
+				insertParagraph(); // Reuse your smart indent function
+			}
+
+			// --- CTRL + SHIFT + TAB (Remove Indent) ---
+			if (e.key === 'Tab' && e.shiftKey) {
+				e.preventDefault();
+				removeIndent();
+			}
+		});
 	});
-
-    // Also apply on 'change' to ensure it locks in on mobile
-   colorPicker.addEventListener('change', (e) => {
-		const selectedColor = e.target.value;
-		
-		// Update the UI icon color
-		colorBtn.querySelector('span').style.color = selectedColor;
-		
-		// Force focus back to notepad FIRST
-		notepad.focus(); 
-		
-		// Re-highlight the text that was selected before the picker opened
-		restoreSelection();
-		
-		// Apply the color
-		document.execCommand('foreColor', false, selectedColor);
-		
-		// Cleanup
-		savedRange = null; 
-		console.log("Color applied to mobile selection");
-	});
-	
-	// Toggle the 3rd Menu
-    toggleBtn.addEventListener('click', () => {
-        if (extraToolbar.style.display === 'none') {
-            extraToolbar.style.display = 'flex';
-            toggleBtn.innerHTML = '🛠️ Extra Tools ▴';
-            toggleBtn.style.background = 'var(--accent)';
-        } else {
-            extraToolbar.style.display = 'none';
-            toggleBtn.innerHTML = '🛠️ Extra Tools ▾';
-            toggleBtn.style.background = '#673ab7';
-        }
-    });
-	
-	// Initial load
-    loadSystemFonts();
-	
-	// Run once on load
-	checkLanguageForCase();
-	
-	// --- KEYBOARD SHORTCUTS FOR FORMATTING ---
-   // To handle Alt + H + 4, we need to track if H was pressed while Alt was down
-    let altHPressed = false;
-
-    document.addEventListener('keydown', (e) => {
-        if (document.activeElement !== notepad) return;
-
-        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-        const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
-        const key = e.key.toLowerCase();
-
-        // 1. Standard Shortcuts
-        if (ctrlOrCmd && key === 'b') { e.preventDefault(); format('bold'); }
-        if (ctrlOrCmd && key === 'i') { e.preventDefault(); format('italic'); }
-        if (ctrlOrCmd && key === 'u') { e.preventDefault(); format('underline'); }
-
-        // 2. Strikethrough for MAC: Cmd + Shift + X
-        if (isMac && ctrlOrCmd && e.shiftKey && key === 'x') {
-            e.preventDefault();
-            format('strikeThrough');
-        }
-
-        // 3. Strikethrough for WINDOWS: Alt + H + 4
-        if (!isMac) {
-            // Check if user is holding Alt and presses H
-            if (e.altKey && key === 'h') {
-                e.preventDefault(); // Stop browser help menu
-                altHPressed = true;
-                
-                // Reset the tracker after 1 second if 4 isn't pressed
-                setTimeout(() => { altHPressed = false; }, 1000);
-            }
-
-            // If Alt+H was just pressed and the user now hits 4
-            if (altHPressed && key === '4') {
-                e.preventDefault();
-                format('strikeThrough');
-                altHPressed = false; // Reset
-            }
-        }
-		// 4. Bullet Shortcut: Ctrl/Cmd + Shift + 8
-		if (ctrlOrCmd && e.shiftKey && e.key.toLowerCase() === '*') {
-			e.preventDefault();
-			format('insertUnorderedList');
-		}
-		
-		// 5. Allignment Shortcut keys
-		if (ctrlOrCmd && e.shiftKey) {
-            if (e.key.toLowerCase() === 'l') { e.preventDefault(); formatAlign('justifyLeft'); }
-            if (e.key.toLowerCase() === 'e') { e.preventDefault(); formatAlign('justifyCenter'); }
-            if (e.key.toLowerCase() === 'r') { e.preventDefault(); formatAlign('justifyRight'); }
-        }			
-    });
-	
-	//Paragraph Shortcut key Tab
-	notepad.addEventListener('keydown', (e) => {
-		const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-		const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
-
-		// --- TAB (Indent) ---
-		if (e.key === 'Tab' && !e.shiftKey) {
-			e.preventDefault(); 
-			insertParagraph(); // Reuse your smart indent function
-		}
-
-		// --- CTRL + SHIFT + TAB (Remove Indent) ---
-		if (e.key === 'Tab' && e.shiftKey) {
-			e.preventDefault();
-			removeIndent();
-		}
-	});
-});
