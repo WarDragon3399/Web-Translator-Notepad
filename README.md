@@ -6,7 +6,11 @@ Built for students, reporters, courts, and professionals who need fast, sovereig
 👉 **Live Demo:** [Web Translator Notepad](https://wardragon3399.github.io/Web-Translator-Notepad/)
 
 ---
-
+## 🚀 Installation
+- Use directly via the [Live Demo](https://wardragon3399.github.io/Web-Translator-Notepad/)  
+- Or install the packaged extension (Edge store/Firefox)
+- for other youn install via this store or download zip/extention file and import in your browser.
+- or below PWD via live project link
 💻 Desktop (Windows, Mac, Linux)
 1. On Edge, Chrome, or Brave:
 2. Open your website URL: https://wardragon3399.github.io/Web-Translator-Notepad/
@@ -65,10 +69,7 @@ Just a **sovereign, offline‑first tool** that adapts to your device and langua
 
 ---
 
-## 🚀 Installation
-- Use directly via the [Live Demo](https://wardragon3399.github.io/Web-Translator-Notepad/)  
-- Or install the packaged extension (Edge store/Firefox)
-- for other youn install via this store or download zip/extention file and import in your browser.  
+
 
 ---
 
