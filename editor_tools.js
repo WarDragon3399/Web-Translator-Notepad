@@ -31,6 +31,7 @@
 		
 		setTimeout(checkLanguageForCase, 100);
 		let savedRange = null;
+		let fontsLoaded = false;
 		
 		function format(command) {
 			document.execCommand(command, false, null);
@@ -357,7 +358,20 @@
 		
 		// for font Style LISTENERS
 		// Re-filter fonts when the user changes the writing language
-		srcLang.addEventListener('change', loadSystemFonts);
+		fontSelect.addEventListener('mousedown', async () => {
+			if (!isFontLoaded) {
+				await loadSystemFonts();
+				isFontLoaded = true;
+			}
+		});
+
+		// Remove the loadSystemFonts call from the srcLang listener
+		srcLang.addEventListener('change', () => {
+			checkLanguageForCase();
+			// Reset font loaded status so it re-filters on next click
+			isFontLoaded = false; 
+			fontSelect.innerHTML = '<option value="inherit">Default Font (Click to load system fonts)</option>';
+		});
 		
 		// ParagraphListener for 
 		btnPara.addEventListener('click', (e) => {
@@ -418,7 +432,7 @@
 		});
 		
 		// Initial load
-		loadSystemFonts();
+		populateWebSafeFonts();
 		
 		// Run once on load
 		checkLanguageForCase();
