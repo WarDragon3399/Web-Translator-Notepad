@@ -36,6 +36,13 @@
 
     // Button logic to open Google Lens upload page
     document.getElementById('openLensBtn').addEventListener('click', () => {
-        window.open('https://lens.google.com/upload', '_blank');
-    });
+    // Attempt to trigger the native Google Assistant/Lens intent
+    const intentUrl = "intent://google.com/searchbyimage#Intent;scheme=https;package=com.google.android.googlequicksearchbox;end";
+    
+    // Fallback to web if the intent fails
+    window.location.href = intentUrl;
+    setTimeout(() => {
+        window.open('https://www.google.com/searchbyimage', '_blank');
+    }, 500);
+});
 })();
