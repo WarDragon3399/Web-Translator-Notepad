@@ -494,6 +494,10 @@
 			</button>
 			<input type="color" id="colorPicker" style="display: none;" value="#2e89ff">
 			<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
+			<button id="openLensBtn" title="Open Google Lens to detect text" style="background: #4285f4; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+				🔍 Open Google Lens
+			</button>
+			<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
 			<button id="toggleExtraBtn" style="background: #673ab7; color: white;">🛠️ Extra Tools ▾</button>
 			<div style="position: relative; display: inline-block; z-index: 10001;">
 				<button id="supportBtn" style="background: #ff9800; color: #000; font-weight: bold;">☕ Support ▾</button>
@@ -534,6 +538,7 @@
 		<script src="clear.js"></script>
 		<script src="watermark.js"></script>
 		<script src="autosave.js"></script>
+		<script src="lens_bridge.js"></script>
 		
 		<div id="saveDropdown" style="display: none; position: fixed; background: var(--box); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 9999; min-width: 180px;">
 			<div id="saveTxtBtn" style="padding: 12px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
