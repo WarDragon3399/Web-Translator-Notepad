@@ -5,3 +5,8 @@ chrome.action.onClicked.addListener(() => {
     url: chrome.runtime.getURL("index.html")
   });
 });
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "openLensTab") {
+        chrome.tabs.create({ url: "https://lens.google.com/upload?ep=subbar" });
+    }
+});
