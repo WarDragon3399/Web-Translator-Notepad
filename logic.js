@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		lastFinalAt = now;
 		return isDuplicate;
 	}
-
+	
 	if (Recognition) {
 		recognition = new Recognition();
 		recognition.continuous = true;
