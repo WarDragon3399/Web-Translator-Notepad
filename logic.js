@@ -81,9 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			// 1. Loop through results
 			for (let i = event.resultIndex; i < event.results.length; i++) {
-				const transcript = event.results[i][0].transcript;
-				if (event.results[i].isFinal) {
-					finalTranscript += event.results[i][0].transcript;
+				const result = event.results[i];
+				const transcript = event.result[0].transcript;
+				if (result.isFinal) {
+					finalTranscript += transcript;
 				} else {
 					interimTranscript += transcript;
 				}
@@ -95,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			// 3. Insert the Finalized text
 			if (finalTranscript !== '') {
-				let processedText = finalTranscript;
+				let processedText = finalTranscript.trim();
 				const currentLang = document.getElementById('srcLang').value;
 
 				// Apply CapsLock only if it's ON and language is English
@@ -108,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				
 				// Auto-scroll to bottom
 				notepad.scrollTop = notepad.scrollHeight;
-				
 				if (typeof updateCounts === "function") updateCounts();
 			}
 				
@@ -149,8 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		};
 	}
-	
-	
 
 	// Global functions for the Button OnClicks
 	function startVoice() {
