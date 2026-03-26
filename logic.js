@@ -60,17 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		return text.toLowerCase().trim().split(/\s+/).join(' ');
 	}
 
-	function isLikelyDuplicateFinal(chunk) {
-		const normalized = normalizeSpeechChunk(chunk);
-		if (!normalized) return false;
-
-		const now = Date.now();
-		const isDuplicate = normalized === lastFinalChunk && (now - lastFinalAt) < 2000;
-		lastFinalChunk = normalized;
-		lastFinalAt = now;
-		return isDuplicate;
-	}
-	
 	if (Recognition) {
 		recognition = new Recognition();
 		recognition.continuous = true;
