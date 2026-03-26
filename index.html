@@ -35,18 +35,16 @@
 			/* --- THE TOOLBAR ENGINE --- */
 			.toolbar { 
 				background: var(--box); 
-				padding: 10px 15px; 
+				padding: 5px 10px;     
 				display: flex; 
-				gap: 10px; 
+				gap: 4px;              
 				border-bottom: 1px solid var(--border); 
 				align-items: center; 
 				box-shadow: 0 2px 10px rgba(0,0,0,0.3); 
 				z-index: 5; 
 				
-				/* MOBILE DEFAULT: Swipe enabled */
 				flex-wrap: nowrap; 
 				overflow-x: auto; 
-				white-space: nowrap;
 				scrollbar-width: none; 
 			}
 
@@ -56,9 +54,8 @@
 			/* DESKTOP RESET: This fixes the "Wide" issue */
 			@media (min-width: 1024px) {
 				.toolbar {
-					flex-wrap: wrap;       /* Allows buttons to move to next line if needed */
-					overflow-x: hidden;    /* Removes horizontal scroll on PC */
-					white-space: normal;   /* Allows text to behave normally */
+					flex-wrap: nowrap;    
+					overflow-x: visible; 
 					justify-content: flex-start;
 				}
 
@@ -81,15 +78,15 @@
 
 			/* --- BUTTONS & INPUTS --- */
 			select, button { 
-				padding: 8px 14px; 
-				border-radius: 8px; 
+				padding: 6px 8px;       
+				border-radius: 6px;    
 				border: 1px solid var(--border); 
 				cursor: pointer; 
-				font-size: 13px; 
+				font-size: 12px;       
 				font-weight: 600; 
 				background: var(--box); 
 				color: var(--text); 
-				transition: 0.2s; 
+				transition: 0.2s;
 			}
 
 			button { background: var(--accent); color: white; border: none; }
@@ -194,10 +191,9 @@
 
 			/* Optional: Make formatting buttons look a bit different */
 			#formatToolbar button {
-				min-width: 40px;
-				font-family: 'Times New Roman', serif;
+				min-width: 32px;
+				padding: 6px 4px;
 			}
-			
 			/* Styling for active formatting buttons */
 			.format-active {
 				background-color: var(--accent) !important;
@@ -395,6 +391,9 @@
 	</head>
 	<body>
 		<div class="toolbar">
+			<button id="resetNotepadBtn" title="Start a New Blank Note" style="background: #ff4444; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+				🗑️ New Note
+			</button>
 			<div style="position: relative; display: inline-block;">
 				<button id="saveMenuBtn" style="background: #2e89ff;">💾 Save As... ▾</button>
 			</div>
@@ -462,10 +461,10 @@
 				<option value="th">Thai</option>
 				<option value="vi">Vietnamese</option>
 			</select> 
-			<button id="convertBtn">🔄 Convert</button>
+			<button id="convertBtn">🔄 Translate</button>
 			<button id="speakBtn">🔊 Speak</button>
 			<button id="stopBtn" style="background:#d13438">🛑 Stop Audio</button>
-			<button id="themeBtn" style="background:#444">🌓 Theme</button>
+			<button id="themeBtn" style="background:#444">🌓</button>
 			<button id="helpBtn" style="background: #607d8b"> ? Help </button>
 			<button id="creditsBtn" class="btn-credits">ℹ️ Credits</button>
 		</div>
@@ -495,7 +494,7 @@
 			<input type="color" id="colorPicker" style="display: none;" value="#2e89ff">
 			<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
 			<button id="openLensBtn" title="Open Google Lens to detect text" style="background: #4285f4; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
-				🔍 Open Google Lens
+				🔍 GLens
 			</button>
 			<div style="width:1px; background:var(--border); height:20px; margin:0 5px;"></div>
 			<button id="toggleExtraBtn" style="background: #673ab7; color: white;">🛠️ Extra Tools ▾</button>
@@ -539,6 +538,7 @@
 		<script src="watermark.js"></script>
 		<script src="autosave.js"></script>
 		<script src="lens_bridge.js"></script>
+		<script src="refresh_logic.js"></script>
 		
 		<div id="saveDropdown" style="display: none; position: fixed; background: var(--box); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 9999; min-width: 180px;">
 			<div id="saveTxtBtn" style="padding: 12px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
