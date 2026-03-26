@@ -51,8 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 	let recognition;
 	let isUserStopping = true;
-	let recognition;
-	let isUserStopping = true;
 	let lastFinalChunk = '';
 	let lastFinalAt = 0;
 
