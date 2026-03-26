@@ -51,8 +51,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 	let recognition;
 	let isUserStopping = true;
-	let lastFinalChunk = "";
+	let recognition;
+	let isUserStopping = true;
+	let lastFinalChunk = '';
 	let lastFinalAt = 0;
+
+	function normalizeSpeechChunk(text) {
+		// Avoid advanced regex features so this works on older mobile browsers.
+		// We only lowercase + collapse whitespace for lightweight duplicate checks.
+		return text.toLowerCase().trim().split(/\s+/).join(' ');
+	}
 
 	function isLikelyDuplicateFinal(chunk) {
 		const normalized = normalizeSpeechChunk(chunk);
