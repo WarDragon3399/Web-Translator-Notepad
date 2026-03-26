@@ -51,6 +51,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 	let recognition;
 	let isUserStopping = true;
+	let lastFinalChunk = "";
+	let lastFinalAt = 0;
+
+	function normalizeSpeechChunk(text) {
+		return text
+			.toLowerCase()
+			.replace(/[^\p{L}\p{N}\s]/gu, '')
+			.replace(/\s+/g, ' ')
+			.trim();
+	}
+
+	function isLikelyDuplicateFinal(chunk) {
+		const normalized = normalizeSpeechChunk(chunk);
+		if (!normalized) return false;
+
+		const now = Date.now();
+		const isDuplicate = normalized === lastFinalChunk && (now - lastFinalAt) < 2000;
+		lastFinalChunk = normalized;
+		lastFinalAt = now;
+		return isDuplicate;
+	}
 
 	if (Recognition) {
 		recognition = new Recognition();
