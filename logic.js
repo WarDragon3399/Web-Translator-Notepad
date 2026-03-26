@@ -79,20 +79,22 @@ document.addEventListener('DOMContentLoaded', () => {
 			let finalTranscript = "";
 			let interimTranscript = "";
 
+			// 1. Loop through results
 			for (let i = event.resultIndex; i < event.results.length; i++) {
 				const transcript = event.results[i][0].transcript;
 				if (event.results[i].isFinal) {
-					finalTranscript += transcript;
+					finalTranscript += event.results[i][0].transcript;
 				} else {
 					interimTranscript += transcript;
 				}
 			}
 
+			// 2. Handle the temporary "Interim" text (gray/italic preview)
 			const existingInterim = document.getElementById('interim-span');
 			if (existingInterim) existingInterim.remove();
 
-			if (finalTranscript) {
-				// Inserts at cursor position
+			// 3. Insert the Finalized text
+			if (finalTranscript !== '') {
 				let processedText = finalTranscript;
 				const currentLang = document.getElementById('srcLang').value;
 
@@ -100,10 +102,16 @@ document.addEventListener('DOMContentLoaded', () => {
 				if (isCapsLockOn && currentLang.startsWith('en')) {
 					processedText = finalTranscript.toUpperCase();
 				}
-
+				
+				// Use ONLY this to insert text at the cursor (prevents double writing)
 				document.execCommand('insertText', false, " " + processedText);
+				
+				// Auto-scroll to bottom
+				notepad.scrollTop = notepad.scrollHeight;
+				
+				if (typeof updateCounts === "function") updateCounts();
 			}
-
+				
 			if (interimTranscript) {
 				const span = document.createElement('span');
 				span.id = 'interim-span';
