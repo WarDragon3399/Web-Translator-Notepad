@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 2. Voice Recognition Setup ---
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-	let recognition;
+		let recognition;
 	let isUserStopping = true;
 	let lastFinalChunk = "";
 	let lastFinalAt = 0;
@@ -57,7 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	function normalizeSpeechChunk(text) {
 		return text
 			.toLowerCase()
-			.replace(/[^\p{L}\p{N}\s]/gu, '')
+			// Keep this regex broadly browser-compatible (no Unicode property escapes).
+			// We only strip common punctuation and normalize spaces for duplicate checks.
+			.replace(/[.,/#!$%^&*;:{}=\-_`~()?"'[\]\\|<>@+]/g, '')
 			.replace(/\s+/g, ' ')
 			.trim();
 	}
